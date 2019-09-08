@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   cv_bridge
   image_transport
+  cmake_modules
  
 )
 
@@ -21,7 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-
+find_package(cmake_modules REQUIRED)
 
 
 
@@ -176,6 +177,14 @@ target_link_libraries(ardrone_red_contour
   ${catkin_LIBRARIES}
 )
 target_link_libraries(ardrone_red_contour ${OpenCV_LIBRARIES})
+
+#add_executable(ardrone_keyboard_operation
+#  src/ardrone_keyboard_operation.cpp
+# )
+#target_link_libraries(ardrone_keyboard_operation
+#  ${catkin_LIBRARIES}
+#)
+#target_link_libraries(ardrone_keyboard_operation ${OpenCV_LIBRARIES})
 
 
 
