@@ -40,8 +40,8 @@ private:
 
 KeyboardOperation::KeyboardOperation()
 {
-    sub_keydown_ = n_.subscribe("/keyboard/keydown",10);
-    sub_keyup_ = n_.subscribe("/keyboard/keyup",10);
+    sub_keydown_ = n_.subscribe("/keyboard/keydown", 10, &KeyboardOperation::callbackKeyDown, this);
+    sub_keyup_ = n_.subscribe("/keyboard/keyup",10, &KeyboardOperation::callbackKeyUp, this);
     pub_takeoff_ = n_.advertise<std_msgs::Empty>("/ardrone/takeoff",1);
     pub_land_ = n_.advertise<std_msgs::Empty>("/ardrone/land",1);
     pub_reset_ = n_.advertise<std_msgs::Empty>("/ardrone/reset",1);
