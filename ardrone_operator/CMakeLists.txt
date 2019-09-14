@@ -178,14 +178,6 @@ target_link_libraries(ardrone_red_contour
 )
 target_link_libraries(ardrone_red_contour ${OpenCV_LIBRARIES})
 
-#add_executable(ardrone_keyboard_operation
-#  src/ardrone_keyboard_operation.cpp
-# )
-#target_link_libraries(ardrone_keyboard_operation
-#  ${catkin_LIBRARIES}
-#)
-#target_link_libraries(ardrone_keyboard_operation ${OpenCV_LIBRARIES})
-
 
 
 #target_link_libraries(ardrone_autonomy

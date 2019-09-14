@@ -6,7 +6,7 @@ roslaunch ardrone_autonomy ardrone.launch
 ```
 キーボード操作
 ```
-rosrun adrone_operator ardrone_operator
+roslaunch ardrone_operator ardrone_keyboard_operation.launch
 ```
 赤を認識して離陸
 ```
