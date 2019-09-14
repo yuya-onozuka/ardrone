@@ -178,6 +178,14 @@ target_link_libraries(ardrone_red_contour
 )
 target_link_libraries(ardrone_red_contour ${OpenCV_LIBRARIES})
 
+add_executable(ardrone_follow_navigation
+  src/ardrone_follow_navigation.cpp
+ )
+target_link_libraries(ardrone_follow_navigation
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(ardrone_follow_navigation ${OpenCV_LIBRARIES})
+
 
 
 #target_link_libraries(ardrone_autonomy
