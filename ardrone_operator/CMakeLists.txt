@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(ardrone_operator)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -141,7 +141,7 @@ include_directories(
 ## Declare a C++ library
 add_library(ardrone_operator
   src/ardrone_operator.cpp
-  src/contour_area_calc.cpp
+  src/calc_area_in_contour.cpp
   src/red_extraction.cpp
 )
 target_link_libraries(ardrone_operator
@@ -189,14 +189,14 @@ target_link_libraries(ardrone_red_contour
 )
 target_link_libraries(ardrone_red_contour ${OpenCV_LIBRARIES})
 
-add_executable(ardrone_follow_navigation
-  src/ardrone_follow_navigation.cpp
+add_executable(ardrone_follow_controller
+  src/ardrone_follow_controller.cpp
  )
-target_link_libraries(ardrone_follow_navigation
+target_link_libraries(ardrone_follow_controller
   ${catkin_LIBRARIES}
   ardrone_operator
 )
-target_link_libraries(ardrone_follow_navigation ${OpenCV_LIBRARIES})
+target_link_libraries(ardrone_follow_controller ${OpenCV_LIBRARIES})
 
 
 
