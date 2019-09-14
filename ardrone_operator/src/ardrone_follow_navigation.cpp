@@ -7,6 +7,8 @@
 #include "std_msgs/Header.h"
 #include <vector>
 #include <std_msgs/Empty.h>
+#include <ardrone_operator/contour_area_calc.h>
+#include <ardrone_operator/red_extraction.h>
 
 class ArdroneFollowNavigation
 {
@@ -19,9 +21,10 @@ private:
     void imageCallback(const sensor_msgs::Image::ConstPtr& msg);
 
     ros::NodeHandle n_;
-    image_transport::Subscriber image_sub_;
-    image_transport::Publisher gray_image_pub_;
     ros::Publisher takeoff_pub_;
+    image_transport::Publisher gray_image_pub_;
+    image_transport::Subscriber image_sub_;
+    
     cv::Mat ipt_image_;
     std_msgs::Empty empty_msg_;
 };
@@ -50,58 +53,16 @@ void ArdroneFollowNavigation::imageCallback(const sensor_msgs::Image::ConstPtr& 
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 	}
 
+    cv::Mat red_extract_image = RedExtraction::redExtraction(ipt_image_);
+    double max_area_red = ContourAreaCalc::contourAreaCalc(red_extract_image);
 
-    int height = ipt_image_.rows;
-    int width = ipt_image_.cols;
-
-    cv::Mat red_image = cv::Mat(cv::Size(width, height),CV_8UC1);
-
-    double r_rate = 0.;
-
-    for (int u = 0; u<width; u++){
-        for (int v = 0; v<height;v++)
-        {
-
-            int B = (uchar)ipt_image_.at<cv::Vec3b>(v,u)[0] + 1;
-            int G = (uchar)ipt_image_.at<cv::Vec3b>(v,u)[1] + 1;
-            int R = (uchar)ipt_image_.at<cv::Vec3b>(v,u)[2] + 1; 
-
-            r_rate = R/(1.0*(R+G+B));
- 
-            if(r_rate>0.5)
-            {
-                red_image.at<unsigned char>(v,u) = 255;
-                // cv::cvtColor(ipt_image,red_image,CV_BGR2GRAY);
-            }
-            else
-            { 
-                red_image.at<unsigned char>(v,u) = 0;
-            }
-        }
-    }
-
-    std::vector<std::vector<cv::Point>> contours;
-    findContours(red_image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-    double max_area_red=0;
-    int max_area_contour_red=-1;
-    for(int j=0;j<contours.size();j++)
-    {
-        double occupied_area_red=contourArea(contours.at(j));
-        if(max_area_red<occupied_area_red)
-        {
-            max_area_red=occupied_area_red;
-            max_area_contour_red=j;
-        }
-    }    
-
-    occupied_area_ratio_red_ = max_area_red / (height*width);
+    occupied_area_ratio_red_ = max_area_red / (ipt_image_.rows*ipt_image_.cols);
     std::cout << occupied_area_ratio_red_ << std::endl;
-    ROS_INFO("height = %d",height);
-    ROS_INFO("width = %d",width);
+    
     ROS_INFO("occupied_area_red = %lf",max_area_red);
     ROS_INFO("occupied_area_ratio_red = %lf",occupied_area_ratio_red_);
 
- 	sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", red_image).toImageMsg();
+ 	sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", red_extract_image).toImageMsg();
  	gray_image_pub_.publish(img_msg);
 
     if(max_area_red > 0.2)

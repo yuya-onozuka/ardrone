@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ##opencv
 find_package(OpenCV)
+find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(cmake_modules REQUIRED)
@@ -118,7 +119,10 @@ find_package(cmake_modules REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ardrone_operator
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS
+  roscpp 
+  rospy 
+  std_msgs
 #  DEPENDS system_lib
 )
 
@@ -130,16 +134,22 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
+  src
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-#add_library(${PROJECT_NAME}
-#  src/${PROJECT_NAME}/ardrone_operator.cpp
-#)
-#target_link_libraries(${PROJECT_NAME}
-#  ${catkin_LIBRARIES}
-#)
+add_library(ardrone_operator
+  src/ardrone_operator.cpp
+  src/contour_area_calc.cpp
+  src/red_extraction.cpp
+)
+target_link_libraries(ardrone_operator
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(ardrone_operator
+  ${OpenCV_LIBRARIES}
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -149,9 +159,10 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(ardrone_operator
-  src/ardrone_operator.cpp
- )
+#add_executable(ardrone_operator
+#  src/ardrone_operator.cpp
+#  src/contour_area_calculator.cpp
+# )
 
  add_executable(ardrone_cv_test
   src/ardrone_cv_test.cpp
@@ -183,6 +194,7 @@ add_executable(ardrone_follow_navigation
  )
 target_link_libraries(ardrone_follow_navigation
   ${catkin_LIBRARIES}
+  ardrone_operator
 )
 target_link_libraries(ardrone_follow_navigation ${OpenCV_LIBRARIES})
 
