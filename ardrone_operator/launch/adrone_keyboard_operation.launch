@@ -1,5 +1,4 @@
 <launch>
     <node name="keyboard" pkg="keyboard" type="keyboard" output="screen" />
-    <node name="ardrone_keyboard_operation" pkg="ardrone_operator" type="ardrone_keyboard_operation" />
-    </node>
+    <node name="ardrone_keyboard_operation" pkg="ardrone_operator" type="ardrone_keyboard_operation.py" />
 </launch>
