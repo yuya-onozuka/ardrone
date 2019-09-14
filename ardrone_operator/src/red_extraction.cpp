@@ -1,6 +1,6 @@
 #include <ardrone_operator/red_extraction.h>
 
-cv::Mat RedExtraction::redExtraction(cv::Mat& image)
+cv::Mat RedExtraction::extractRedFrom(cv::Mat& image)
 {
     int width = image.cols;
     int height = image.rows;

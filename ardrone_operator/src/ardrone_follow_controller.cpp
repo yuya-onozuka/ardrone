@@ -74,7 +74,7 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
 	}
 
     //赤色を抽出して白黒画像に変換
-    cv::Mat red_extract_image = RedExtraction::redExtraction(ipt_image_);
+    cv::Mat red_extract_image = RedExtraction::extractRedFrom(ipt_image_);
     //最も面積が大きい輪郭の面積
     state_marker_area_ = CalcAreaInContour::calcAreaInContour(red_extract_image);
 

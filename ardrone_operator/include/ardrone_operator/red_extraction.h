@@ -8,7 +8,7 @@
 class RedExtraction
 {
 public:
-    static cv::Mat redExtraction(cv::Mat& image);
+    static cv::Mat extractRedFrom(cv::Mat& image);
 };
 
 #endif // RED_EXTRACTION_H_
