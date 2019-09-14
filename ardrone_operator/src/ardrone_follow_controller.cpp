@@ -117,7 +117,7 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
 void ArdroneFollowController::controlVelocity()
 {
     Eigen::Vector3d gain(0.05, 0.05, 0.05);
-    double target_maker_area;
+    double target_maker_area = 10000;
     ardrone_vel_.linear.x += gain[0] * pow((target_maker_area - state_marker_area_), 0.5);
     ardrone_vel_.linear.y += gain[1] * (target_marker_pos_[0] - state_marker_pos_[0]);
     ardrone_vel_.linear.z += gain[2] * (target_marker_pos_[1] - state_marker_pos_[1]);
