@@ -44,5 +44,8 @@ Eigen::Vector2d CalcAreaInContour::calcCentroidInContour(cv::Mat& image)
     }
     centroid[0] /= points_num;
     centroid[1] /= points_num;
+    // centroid[0] = (contours.at(max_area_contour).at(0).x + contours.at(max_area_contour).at(points_num -1).x)/2;
+    // centroid[1] = (contours.at(max_area_contour).at(0).y + contours.at(max_area_contour).at(points_num -1).y)/2;
+
     return centroid;
 }
