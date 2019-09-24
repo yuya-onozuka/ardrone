@@ -22,7 +22,7 @@ Eigen::Matrix4d Marker2CameraTransform::marker2camera_matrix(std::vector<cv::Poi
     cv::Rodrigues(rotation_vector, rotation_matrix);
 
     //create transform_matrix
-    Eigen::Matrix4d rt_transform_matrix;
+    Eigen::Matrix4d rt_transform_matrix = Eigen::Matrix4d::Zero();
     for(int i = 0; i < 3; i++)
     {
         for(int j = 0; j < 3; j++)
