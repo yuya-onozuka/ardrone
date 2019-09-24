@@ -2,15 +2,15 @@
 ## 実行方法
 ドライバ起動
 ```
-roslaunch ardrone_autonomy ardrone.launch
+$ roslaunch ardrone_autonomy ardrone.launch
 ```
 キーボード操作
 ```
-roslaunch ardrone_operator ardrone_keyboard_operation.launch
+$ roslaunch ardrone_operator ardrone_keyboard_operation.launch
 ```
 マーカー追従制御
 ```
-rosrun ardrone_operator adrone_follow_controller
+$ rosrun ardrone_operator adrone_follow_controller
 ```
 
 ## 参考サイト
