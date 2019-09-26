@@ -144,6 +144,7 @@ add_library(ardrone_operator
   src/calc_area_in_contour.cpp
   src/red_extraction.cpp
   src/marker2camera_tf.cpp
+  src/estimate_marker_pose.cpp
 )
 target_link_libraries(ardrone_operator
   ${catkin_LIBRARIES}
