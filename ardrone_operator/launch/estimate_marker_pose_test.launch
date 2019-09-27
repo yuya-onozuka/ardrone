@@ -1,0 +1,4 @@
+<launch>
+    <node name="estimate_marker_pose_test_node" pkg="ardrone_operator" type="estimate_marker_pose_test_node" output="screen"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d ardrone_operator/config/estimate_marker_pose_test.rviz"/>
+</launch>

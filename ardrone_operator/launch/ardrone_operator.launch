@@ -1,5 +1,6 @@
 <launch>
     <!-- <node name="keyboard" pkg="keyboard" type="keyboard" output="screen" /> -->
     <!-- <node name="ardrone_keyboard_operation" pkg="ardrone_operator" type="ardrone_keyboard_operation.py" /> -->
-    <node name="ardrone_follow_controller" pkg="ardrone_operator" type="ardrone_follow_controller" />
+    <node name="ardrone_follow_controller" pkg="ardrone_operator" type="ardrone_follow_controller" output="screen"/>
+    <node pkg="rviz" type="rviz" name="rviz" args=""/>
 </launch>

@@ -10,9 +10,14 @@
 class EstimateMarkerPose
 {
 public:
-    static Eigen::Matrix4d estimateMarkerPose(cv::Mat& imput_image,
-                                              cv::Mat& camera_matrix,
-                                              cv::Mat& distortion_coefficients);
+    EstimateMarkerPose();
+    ~EstimateMarkerPose();
+
+    std::vector<Eigen::Matrix4d> estimateMarkersPose(cv::Mat& imput_image,
+                                                     cv::Mat& camera_matrix,
+                                                     cv::Mat& distortion_coefficients);
+
+    cv::Mat draw_image_;
 };
 
 #endif // ESTIMATE_MARKER_POSE_H_
