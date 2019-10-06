@@ -30,9 +30,10 @@ public:
 
 private:
     void imageCallback(const sensor_msgs::Image::ConstPtr& msg);
-    void controlVelocity();
-    void velocityZero();
+    void computeVelocity();
+    void hoveringGradually();
 
+    //ros 
     ros::NodeHandle n_;
     ros::Publisher takeoff_pub_;
     ros::Publisher land_pub_;
@@ -40,11 +41,10 @@ private:
     image_transport::Publisher gray_image_pub_;
     image_transport::Publisher draw_image_pub_;
     image_transport::Subscriber image_sub_;
-    
-    cv::Mat input_image_;
     std_msgs::Empty empty_msg_;
     geometry_msgs::Twist ardrone_vel_;
 
+    cv::Mat input_image_;
     double state_marker_area_;
     
     double now_time_;
@@ -53,28 +53,21 @@ private:
     double average_deviation_x_image_;
     double average_deviation_y_image_;
 
-
     int time_counter_;
-
 
     cv::Point2i state_marker_point_;
     cv::Point2i target_marker_point_;
-    // Eigen::Vector2d target_marker_pos_;
-    // Eigen::Vector2d state_marker_pos_;
 
     Eigen::Matrix3d eigen_camera_matrix_;
     Eigen::VectorXd eigen_dist_coeffs_;
 
     Eigen::Vector4d marker_coodinate_target_point_;
-    
-
-    // double occupied_area_ratio_red_;
 
     bool takeoff_flag_;
     bool land_flag_;
     bool calc_finished_flag_;
     
-
+    // estimate marker pose instance 
     std::unique_ptr<EstimateMarkerPose> emp_;
 };
 
@@ -101,9 +94,6 @@ ArdroneFollowController::ArdroneFollowController()
     marker_coodinate_target_point_ << 0., 0., 0., 1.;
 
     emp_.reset(new EstimateMarkerPose());
-
-
-    
 }
 
 ArdroneFollowController::~ArdroneFollowController()
@@ -191,30 +181,17 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     {
         if(rt_matrixes.size() > 0)
         {
-            ArdroneFollowController::controlVelocity();
+            ArdroneFollowController::computeVelocity();
         }
         else if(rt_matrixes.size() == 0)
         {
-            ArdroneFollowController::velocityZero();
+            ArdroneFollowController::hoveringGradually();
         }
         
         vel_pub_.publish(ardrone_vel_);
         ROS_INFO("unko_vel");
     }
-    // if(rt_matrixes.size() == 0 && takeoff_flag_==true)
-    // {
-    //     ardrone_vel_.linear.x = 0.;
-    //     ardrone_vel_.linear.y = 0.;
-    //     ardrone_vel_.linear.z = 0.;
-    //     ardrone_vel_.angular.z = 0.;
-    //     vel_pub_.publish(ardrone_vel_);
-        // land_pub_.publish(empty_msg_);
-        // bool land_flag_ = true;
-        
-        // ROS_INFO("unko_land");
-        // ROS_INFO("unko_fin");
-        // ros::shutdown();
-    // }
+
     if(occupied_area_ratio_red > 0.3 && takeoff_flag_ == NULL)
     {
         takeoff_pub_.publish(empty_msg_);
@@ -223,7 +200,7 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     }
 }
 
-void ArdroneFollowController::controlVelocity()
+void ArdroneFollowController::computeVelocity()
 {
     Eigen::Vector3d gain(0.00005, 0.001, 0.001);
     double target_maker_area = 10000;
@@ -240,7 +217,7 @@ void ArdroneFollowController::controlVelocity()
     // vel_pub_.publish(ardrone_vel_);
 }
 
-void ArdroneFollowController::velocityZero()
+void ArdroneFollowController::hoveringGradually()
 {
     Eigen::Vector3d gain(0.00005, 0.001, 0.001);
     ardrone_vel_.linear.x = 0.;
@@ -251,20 +228,17 @@ void ArdroneFollowController::velocityZero()
 
 int main(int argc, char** argv)
 {
- 	ros::init (argc, argv, "img_contour");
-
-    
-    
+ 	ros::init (argc, argv, "ardrone_follow_controller");
     ros::NodeHandle n;
     ros::Rate rate(10);
+
     ArdroneFollowController follow;
-    if(!follow.time_start_flag_){
-        
+    if(!follow.time_start_flag_)
+    {
         follow.pre_time_ = ros::Time::now().toSec();
-        
         follow.time_start_flag_ = true;
     }
-    ROS_INFO("unko_on");
+
     ros::spin();
  	return 0;
 }
