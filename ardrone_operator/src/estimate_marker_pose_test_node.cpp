@@ -42,8 +42,6 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& msg)
 	}
     EstimateMarkerPose emp;
     std::vector<Eigen::Matrix4d> rt_matrixes = emp.estimateMarkersPose(input_image, camera_matrix, distortion_coefficients);
-    std::cout << "aaaaaaaaaaaaaaaa" << std::endl;
-    // std::cout << rt_matrixes[0] << std::endl;
     sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", emp.draw_image_).toImageMsg();
     draw_image_pub.publish(img_msg);
 }

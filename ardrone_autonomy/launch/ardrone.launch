@@ -30,5 +30,7 @@
         <rosparam param="cov/imu_av">[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]</rosparam>
         <rosparam param="cov/imu_or">[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 100000.0]</rosparam>
     </node>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ardrone_operator)/config/ardrone.rviz"/>
 </launch>
 

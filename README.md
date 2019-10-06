@@ -1,14 +1,25 @@
 # ardrone  
 ## 実行方法
-ドライバ起動
+### ドライバ起動
 ```
 $ roslaunch ardrone_autonomy ardrone.launch
 ```
-キーボード操作
+### キーボード操作
 ```
 $ roslaunch ardrone_operator ardrone_keyboard_operation.launch
 ```
-マーカー追従制御
+### rosbag保存方法
+- ardrone.launchを実行する必要なし。
+filenameはアルファベットから始める。
+```
+$ roslaunch ardrone_operator ardrone_record.launch bagfile_name:=filename
+```
+### rosbag実行方法
+- ardrone.launchは実行しない。
+```
+$ roslaunch ardrone_operator ardrone_play.launch bagfile_name:=filename
+```
+### マーカー追従制御
 ```
 $ rosrun ardrone_operator adrone_follow_controller
 ```

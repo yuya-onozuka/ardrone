@@ -1,0 +1,7 @@
+<launch>
+    <arg name = "path" default = "$(find ardrone_operator)/bag"/>
+    <arg name = "bagfile_name" default = "test"/>
+    <node pkg = "rosbag" type = "play" name = "$(arg bagfile_name)_player" output = "screen"
+          args = "--clock -l $(arg path)/$(arg bagfile_name).bag"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ardrone_operator)/config/ardrone.rviz"/>
+</launch>

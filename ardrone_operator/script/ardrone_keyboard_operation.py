@@ -43,10 +43,13 @@ class KeyboardOperation:
     def keydownCallback(self, key):
         if key.code == ENTER:
             self.pub_takeoff.publish(self.empty_msg)
+            rospy.loginfo("takefoff")
         elif key.code == SPACE:
             self.pub_land.publish(self.empty_msg)
+            rospy.loginfo("land")
         elif key.code == BACKSPACE:
             self.pub_reset.publish(self.empty_msg)
+            rospy.loginfo("reset")
 
         elif key.code == UP:
             self.ardrone_vel.linear.z += VELOCITY_INCLIMENT

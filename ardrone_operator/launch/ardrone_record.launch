@@ -1,0 +1,7 @@
+<launch>
+    <arg name = "path" default = "$(find ardrone_operator)/bag"/>
+    <arg name = "bagfile_name" default = "test"/>
+    <include file = "$(find ardrone_autonomy)/launch/ardrone.launch"/>
+    <node pkg = "rosbag" type = "record" name = "$(arg bagfile_name)_rec" output = "screen"
+          args = "--output-name=$(arg path)/$(arg bagfile_name).bag -a"/>
+</launch>

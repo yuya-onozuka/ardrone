@@ -1,4 +1,5 @@
 <launch>
     <node name="keyboard" pkg="keyboard" type="keyboard" output="screen" />
-    <node name="ardrone_keyboard_operation" pkg="ardrone_operator" type="ardrone_keyboard_operation.py" />
+    <node name="ardrone_keyboard_operation" pkg="ardrone_operator" type="ardrone_keyboard_operation.py" output="screen"/>
+    <node name="cmd_vel" pkg="rostopic" type="rostopic" output="screen" args="echo /cmd_vel"/>
 </launch>
