@@ -4,6 +4,9 @@
 #include <sensor_msgs/Image.h>
 #include <std_msgs/Header.h>
 #include <ardrone_operator/estimate_marker_pose.h>
+#include <ardrone_operator/target_image_point.h>
+
+#include <opencv2/core/core.hpp>
 #include <opencv2/core/eigen.hpp>
 
 ///////////カメラの特性を表すパラメータ
@@ -42,6 +45,16 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& msg)
 	}
     EstimateMarkerPose emp;
     std::vector<Eigen::Matrix4d> rt_matrixes = emp.estimateMarkersPose(input_image, camera_matrix, distortion_coefficients);
+    
+
+    Eigen::Vector4d marker_coodinate_target_point;
+    marker_coodinate_target_point << 0., 0., 0., 1.;
+    if(rt_matrixes.size()>0)
+    {
+        cv::Point2i target_image_point = TargetImagePoint::target_image_point(eigen_mat, rt_matrixes[0], marker_coodinate_target_point);
+        cv::circle(emp.draw_image_, cv::Point(target_image_point.x, target_image_point.y), 10, cv::Scalar(0,0,255), 3, 4);
+        // cv::Mat output_image = TargetPointVisualizer::target_point_visualize_image(emp.draw_image_, eigen_mat, rt_matrixes[0], marker_coodinate_target_point);
+    }
     sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", emp.draw_image_).toImageMsg();
     draw_image_pub.publish(img_msg);
 }

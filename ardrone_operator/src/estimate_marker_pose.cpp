@@ -64,13 +64,13 @@ std::vector<Eigen::Matrix4d> EstimateMarkerPose::estimateMarkersPose(cv::Mat& in
                 rt_transform_matrix(l,3) = translation_vector[l];
             }
             rt_transform_matrixes[i] = rt_transform_matrix;
-            std::cout << rt_transform_matrixes[i] << std::endl;
-            std::cout << rotation_matrix << std::endl;
-            std::cout << rotation_matrixes[i] << std::endl;
-            std::cout << translation_vector << std::endl;
-            std::cout << translation_vectors[i] << std::endl;
+            // rt_transform_matrixes[i] = rt_transform_matrix;
+            // std::cout << rt_transform_matrixes[i] << std::endl;
+            // std::cout << rotation_matrix << std::endl;
+            // std::cout << rotation_matrixes[i] << std::endl;
+            // std::cout << translation_vector << std::endl;
+            // std::cout << translation_vectors[i] << std::endl;
         }
     }
-    
     return rt_transform_matrixes;
 }
