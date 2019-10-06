@@ -140,10 +140,8 @@ include_directories(
 
 ## Declare a C++ library
 add_library(ardrone_operator
-  src/ardrone_operator.cpp
   src/calc_area_in_contour.cpp
   src/red_extraction.cpp
-  src/marker2camera_tf.cpp
   src/estimate_marker_pose.cpp
 )
 target_link_libraries(ardrone_operator
@@ -161,35 +159,6 @@ target_link_libraries(ardrone_operator
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-#add_executable(ardrone_operator
-#  src/ardrone_operator.cpp
-#  src/contour_area_calculator.cpp
-# )
-
- add_executable(ardrone_cv_test
-  src/ardrone_cv_test.cpp
- )
-target_link_libraries(ardrone_cv_test
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(ardrone_cv_test ${OpenCV_LIBRARIES})
-
-add_executable(ardrone_red_detector
-  src/ardrone_red_detector.cpp
- )
-
-target_link_libraries(ardrone_red_detector
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(ardrone_red_detector ${OpenCV_LIBRARIES})
-
-add_executable(ardrone_red_contour
-  src/ardrone_red_contour.cpp
- )
-target_link_libraries(ardrone_red_contour
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(ardrone_red_contour ${OpenCV_LIBRARIES})
 
 add_executable(ardrone_follow_controller
   src/ardrone_follow_controller.cpp
