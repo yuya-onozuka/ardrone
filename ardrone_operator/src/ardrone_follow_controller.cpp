@@ -54,6 +54,22 @@ private:
     double average_deviation_y_image_;
 
     int time_counter_;
+    int deviation_number_threshold_;
+
+
+    struct deviation_factors
+    {
+        double x;
+        double y;
+        double angle;
+        double time;
+
+
+    };
+
+    std::vector<deviation_factors> deviations_array_;
+
+
 
     cv::Point2i state_marker_point_;
     cv::Point2i target_marker_point_;
@@ -176,16 +192,48 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     draw_image_pub_.publish(draw_img_msg);
 
     time_counter_ += 1;
+
+    //過去5個の平均
+    deviation_factors new_factor;
+
+    if(rt_matrixes.size() > 0)
+    {
+        new_factor.x = target_marker_point_.x - state_marker_point_.x;
+        new_factor.y = target_marker_point_.y - state_marker_point_.y;
+
+    }
+    else
+    {
+        new_factor.x = 0;
+        new_factor.y = 0;
+    }
+
+    if(deviations_array_.size() == deviation_number_threshold_)
+    {
+        for (int i = 0; i<deviation_number_threshold_ - 1; i++)
+        {
+            deviations_array_[i] = deviations_array_[i+1];
+        }
+
+        deviations_array_[deviation_number_threshold_ - 1] = new_factor;
+    }
+    else
+    {
+         deviations_array_.push_back(new_factor);
+    }
+    
     
     if(takeoff_flag_==true)
     {
+           
         if(rt_matrixes.size() > 0)
         {
             ArdroneFollowController::computeVelocity();
         }
         else if(rt_matrixes.size() == 0)
         {
-            ArdroneFollowController::hoveringGradually();
+            ArdroneFollowController::computeVelocity();
+            //ArdroneFollowController::hoveringGradually();
         }
         
         vel_pub_.publish(ardrone_vel_);
@@ -202,15 +250,40 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
 
 void ArdroneFollowController::computeVelocity()
 {
-    Eigen::Vector3d gain(0.00005, 0.001, 0.001);
+    //PI制御したい
+    Eigen::Vector3d i_gain(0.00005, 0.001, 0.001);
+    Eigen::Vector3d p_gain(0.00000, 0.000, 0.000);
     double target_maker_area = 10000;
 
-    average_deviation_x_image_ = (average_deviation_x_image_*(time_counter_ - 1) + target_marker_point_.x - state_marker_point_.x)/time_counter_;
-    average_deviation_y_image_ = (average_deviation_y_image_*(time_counter_ - 1) + target_marker_point_.y - state_marker_point_.y)/time_counter_;
+    if(deviations_array_.size()>0)
+    {
+        double i_dev_x = 0;
+        double i_dev_y = 0;
+        double i_dev_z = 0;
+        double i_dev_angle = 0;
+
+        for(int i = 0 ; i<deviations_array_.size() ;i++)
+        {
+            i_dev_x += deviations_array_[i].x;
+            i_dev_y += deviations_array_[i].y;
+        }
+
+        i_dev_x = i_dev_x/deviations_array_.size();
+        i_dev_y = i_dev_y/deviations_array_.size();
+         
+        ardrone_vel_.linear.x = 0.;
+        ardrone_vel_.linear.y = i_gain[1] *i_dev_x + p_gain[1] * deviations_array_[deviations_array_.size() - 1].x;
+        ardrone_vel_.linear.z = i_gain[2] *i_dev_y + p_gain[2] * deviations_array_[deviations_array_.size() - 1].y;
+        ardrone_vel_.angular.z = 0.;
+
+    }
+
+    //average_deviation_x_image_ = (average_deviation_x_image_*(time_counter_ - 1) + target_marker_point_.x - state_marker_point_.x)/time_counter_;
+    //average_deviation_y_image_ = (average_deviation_y_image_*(time_counter_ - 1) + target_marker_point_.y - state_marker_point_.y)/time_counter_;
 
     // ardrone_vel_.linear.x = gain[0] * pow((target_maker_area - state_marker_area_), 0.5);
-    ardrone_vel_.linear.y = gain[1] * (target_marker_point_.x - state_marker_point_.x);
-    ardrone_vel_.linear.z = gain[2] * (target_marker_point_.y - state_marker_point_.y);
+    //ardrone_vel_.linear.y = gain[1] * (target_marker_point_.x - state_marker_point_.x);
+    //ardrone_vel_.linear.z = gain[2] * (target_marker_point_.y - state_marker_point_.y);
     // ROS_INFO("ardrone_vel_x = %lf",ardrone_vel_.linear.x);_
     // ROS_INFO("ardrone_vel_y = %lf",ardrone_vel_.linear.y);
     // ROS_INFO("ardrone_vel_z = %lf",ardrone_vel_.linear.z);
