@@ -256,7 +256,7 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
 
 void ArdroneFollowController::computeVelocity()
 {
-    //PI制御したい
+    //PID制御したい
     Eigen::Vector3d i_gain(0.00005, 0.001, 0.001);
     double i_angle_gain = 0.;
     
@@ -267,26 +267,31 @@ void ArdroneFollowController::computeVelocity()
 
     if(deviations_array_.size()>0)
     {
-        double i_dev_x = 0.;
-        double i_dev_y = 0.;
-        double i_dev_z = 0.;
-        double i_dev_angle = 0.;
+        deviation_factors i_factors;
+        deviation_factors p_factors;
+        deviation_factors d_factors;
+        i_factors.x = 0.;
+        i_factors.y = 0.;
+        i_factors.z = 0.;
+        i_factors.angle = 0.;
+
+        p_factors = deviations_array_[deviations_array_.size() - 1];
 
         for(int i = 0 ; i<deviations_array_.size() ;i++)
         {
-            i_dev_x += deviations_array_[i].x;
-            i_dev_y += deviations_array_[i].y;
-            i_dev_angle = deviations_array_[i].angle;
+            i_factors.x += deviations_array_[i].x;
+            i_factors.y += deviations_array_[i].y;
+            i_factors.angle = deviations_array_[i].angle;
         }
 
-        i_dev_x = i_dev_x/deviations_array_.size();
-        i_dev_y = i_dev_y/deviations_array_.size();
-        i_dev_angle = i_dev_angle/deviations_array_.size();
+        i_factors.x = i_factors.x/deviations_array_.size();
+        i_factors.y = i_factors.y/deviations_array_.size();
+        i_factors.angle = i_factors.angle/deviations_array_.size();
          
         ardrone_vel_.linear.x = 0.;
-        ardrone_vel_.linear.y = i_gain[1] *i_dev_x + p_gain[1] * deviations_array_[deviations_array_.size() - 1].x;
-        ardrone_vel_.linear.z = i_gain[2] *i_dev_y + p_gain[2] * deviations_array_[deviations_array_.size() - 1].y;
-        ardrone_vel_.angular.z = i_dev_angle* i_angle_gain + p_angle_gain * deviations_array_[deviations_array_.size() - 1].angle;
+        ardrone_vel_.linear.y = i_gain[1] *i_factors.x + p_gain[1] * p_factors.x;
+        ardrone_vel_.linear.z = i_gain[2] *i_factors.y + p_gain[2] * p_factors.y;
+        ardrone_vel_.angular.z = i_factors.angle* i_angle_gain + p_angle_gain * p_factors.angle;
 
     }
 
