@@ -15,7 +15,8 @@ public:
 
     std::vector<Eigen::Matrix4d> estimateMarkersPose(cv::Mat& imput_image,
                                                      cv::Mat& camera_matrix,
-                                                     cv::Mat& distortion_coefficients);
+                                                     cv::Mat& distortion_coefficients,
+                                                     double marker_size);
 
     cv::Mat draw_image_;
 };

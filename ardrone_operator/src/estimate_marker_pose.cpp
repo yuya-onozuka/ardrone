@@ -13,7 +13,8 @@ EstimateMarkerPose::~EstimateMarkerPose()
 
 std::vector<Eigen::Matrix4d> EstimateMarkerPose::estimateMarkersPose(cv::Mat& input_image,
                                                                      cv::Mat& camera_matrix,
-                                                                     cv::Mat& distortion_coefficients)
+                                                                     cv::Mat& distortion_coefficients,
+                                                                     double marker_size)
 {
     cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_100);
 
@@ -32,7 +33,7 @@ std::vector<Eigen::Matrix4d> EstimateMarkerPose::estimateMarkersPose(cv::Mat& in
     {
         cv::aruco::drawDetectedMarkers(draw_image_, corners, ids);
         
-        cv::aruco::estimatePoseSingleMarkers(corners, 0.05, camera_matrix, distortion_coefficients, rotation_vectors, translation_vectors);
+        cv::aruco::estimatePoseSingleMarkers(corners, marker_size, camera_matrix, distortion_coefficients, rotation_vectors, translation_vectors);
         
         for(int i=0; i<ids.size(); i++)
         {

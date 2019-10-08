@@ -44,7 +44,7 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& msg)
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 	}
     EstimateMarkerPose emp;
-    std::vector<Eigen::Matrix4d> rt_matrixes = emp.estimateMarkersPose(input_image, camera_matrix, distortion_coefficients);
+    std::vector<Eigen::Matrix4d> rt_matrixes = emp.estimateMarkersPose(input_image, camera_matrix, distortion_coefficients, 0.1);
     
 
     Eigen::Vector4d marker_coodinate_target_point;
