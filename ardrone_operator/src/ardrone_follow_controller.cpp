@@ -50,10 +50,26 @@ private:
     double now_time_;
     double time_duration_threshold_ ;
 
-    double average_deviation_x_image_;
-    double average_deviation_y_image_;
+    //double average_deviation_x_image_;
+    //double average_deviation_y_image_;
 
     int time_counter_;
+    int deviation_number_threshold_;
+
+
+    struct deviation_factors
+    {
+        double x;
+        double y;
+        double angle;
+        double time;
+
+
+    };
+
+    std::vector<deviation_factors> deviations_array_;
+
+
 
     cv::Point2i state_marker_point_;
     cv::Point2i target_marker_point_;
@@ -83,6 +99,7 @@ ArdroneFollowController::ArdroneFollowController()
     takeoff_flag_ = false;
     land_flag_ = false;
     time_duration_threshold_ = 1.;
+    deviation_number_threshold_ = 5;
 
     time_counter_ = 0;
 
@@ -118,8 +135,8 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     {
         pre_time_ = now_time_;
         time_counter_ = 0;
-        average_deviation_x_image_ = 0;
-        average_deviation_y_image_ = 0;
+        //average_deviation_x_image_ = 0;
+        //average_deviation_y_image_ = 0;
     }
 
     cv::Mat camera_matrix;
@@ -177,16 +194,53 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     draw_image_pub_.publish(draw_img_msg);
 
     time_counter_ += 1;
+
+    //過去5個の平均
+    deviation_factors new_factor;
+
+    if(rt_matrixes.size() > 0)
+    {
+        new_factor.x = target_marker_point_.x - state_marker_point_.x;
+        new_factor.y = target_marker_point_.y - state_marker_point_.y;
+        new_factor.angle = atan(-rt_matrixes(0,3)/(rt_matrixes(2,3) + 0.00001));
+        new_factor.time = ros::Time::now.toSec();
+        
+
+    }
+    else
+    {
+        new_factor.x = 0;
+        new_factor.y = 0;
+        new_factor.angle = rt_matrixes(0,3)/(rt_matrixes(2,3) + 0.00001);
+        new_factor.time = ros::Time::now.toSec();
+    }
+
+    if(deviations_array_.size() == deviation_number_threshold_)
+    {
+        for (int i = 0; i<deviation_number_threshold_ - 1; i++)
+        {
+            deviations_array_[i] = deviations_array_[i+1];
+        }
+
+        deviations_array_[deviation_number_threshold_ - 1] = new_factor;
+    }
+    else
+    {
+         deviations_array_.push_back(new_factor);
+    }
+    
     
     if(takeoff_flag_==true)
     {
+           
         if(rt_matrixes.size() > 0)
         {
             ArdroneFollowController::computeVelocity();
         }
         else if(rt_matrixes.size() == 0)
         {
-            ArdroneFollowController::hoveringGradually();
+            ArdroneFollowController::computeVelocity();
+            //ArdroneFollowController::hoveringGradually();
         }
         
         vel_pub_.publish(ardrone_vel_);
@@ -203,15 +257,55 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
 
 void ArdroneFollowController::computeVelocity()
 {
+<<<<<<< HEAD
     Eigen::Vector3d gain(0.00005, 0.0005, 0.0005);
+=======
+    //PID制御したい
+    Eigen::Vector3d i_gain(0.00005, 0.001, 0.001);
+    double i_angle_gain = 0.;
+    
+    Eigen::Vector3d p_gain(0.00000, 0.000, 0.000);
+    double p_angle_gain = 0.;
+
+>>>>>>> 6eb15caba700616952eade8b84d825f06b01369b
     double target_maker_area = 10000;
 
-    average_deviation_x_image_ = (average_deviation_x_image_*(time_counter_ - 1) + target_marker_point_.x - state_marker_point_.x)/time_counter_;
-    average_deviation_y_image_ = (average_deviation_y_image_*(time_counter_ - 1) + target_marker_point_.y - state_marker_point_.y)/time_counter_;
+    if(deviations_array_.size()>0)
+    {
+        deviation_factors i_factors;
+        deviation_factors p_factors;
+        deviation_factors d_factors;
+        i_factors.x = 0.;
+        i_factors.y = 0.;
+        i_factors.z = 0.;
+        i_factors.angle = 0.;
+
+        p_factors = deviations_array_[deviations_array_.size() - 1];
+
+        for(int i = 0 ; i<deviations_array_.size() ;i++)
+        {
+            i_factors.x += deviations_array_[i].x;
+            i_factors.y += deviations_array_[i].y;
+            i_factors.angle = deviations_array_[i].angle;
+        }
+
+        i_factors.x = i_factors.x/deviations_array_.size();
+        i_factors.y = i_factors.y/deviations_array_.size();
+        i_factors.angle = i_factors.angle/deviations_array_.size();
+         
+        ardrone_vel_.linear.x = 0.;
+        ardrone_vel_.linear.y = i_gain[1] *i_factors.x + p_gain[1] * p_factors.x;
+        ardrone_vel_.linear.z = i_gain[2] *i_factors.y + p_gain[2] * p_factors.y;
+        ardrone_vel_.angular.z = i_factors.angle* i_angle_gain + p_angle_gain * p_factors.angle;
+
+    }
+
+    //average_deviation_x_image_ = (average_deviation_x_image_*(time_counter_ - 1) + target_marker_point_.x - state_marker_point_.x)/time_counter_;
+    //average_deviation_y_image_ = (average_deviation_y_image_*(time_counter_ - 1) + target_marker_point_.y - state_marker_point_.y)/time_counter_;
 
     // ardrone_vel_.linear.x = gain[0] * pow((target_maker_area - state_marker_area_), 0.5);
-    ardrone_vel_.linear.y = gain[1] * (target_marker_point_.x - state_marker_point_.x);
-    ardrone_vel_.linear.z = gain[2] * (target_marker_point_.y - state_marker_point_.y);
+    //ardrone_vel_.linear.y = gain[1] * (target_marker_point_.x - state_marker_point_.x);
+    //ardrone_vel_.linear.z = gain[2] * (target_marker_point_.y - state_marker_point_.y);
     // ROS_INFO("ardrone_vel_x = %lf",ardrone_vel_.linear.x);_
     // ROS_INFO("ardrone_vel_y = %lf",ardrone_vel_.linear.y);
     // ROS_INFO("ardrone_vel_z = %lf",ardrone_vel_.linear.z);
