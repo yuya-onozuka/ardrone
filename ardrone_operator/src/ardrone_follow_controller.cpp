@@ -50,8 +50,8 @@ private:
     double now_time_;
     double time_duration_threshold_ ;
 
-    double average_deviation_x_image_;
-    double average_deviation_y_image_;
+    //double average_deviation_x_image_;
+    //double average_deviation_y_image_;
 
     int time_counter_;
     int deviation_number_threshold_;
@@ -98,6 +98,7 @@ ArdroneFollowController::ArdroneFollowController()
     vel_pub_ = n_.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     land_flag_ = false;
     time_duration_threshold_ = 1.;
+    deviation_number_threshold_ = 5;
 
     time_counter_ = 0;
 
@@ -133,8 +134,8 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     {
         pre_time_ = now_time_;
         time_counter_ = 0;
-        average_deviation_x_image_ = 0;
-        average_deviation_y_image_ = 0;
+        //average_deviation_x_image_ = 0;
+        //average_deviation_y_image_ = 0;
     }
 
     cv::Mat camera_matrix;
@@ -200,12 +201,17 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     {
         new_factor.x = target_marker_point_.x - state_marker_point_.x;
         new_factor.y = target_marker_point_.y - state_marker_point_.y;
+        new_factor.angle = atan(-rt_matrixes(0,3)/(rt_matrixes(2,3) + 0.00001));
+        new_factor.time = ros::Time::now.toSec();
+        
 
     }
     else
     {
         new_factor.x = 0;
         new_factor.y = 0;
+        new_factor.angle = rt_matrixes(0,3)/(rt_matrixes(2,3) + 0.00001);
+        new_factor.time = ros::Time::now.toSec();
     }
 
     if(deviations_array_.size() == deviation_number_threshold_)
@@ -252,29 +258,35 @@ void ArdroneFollowController::computeVelocity()
 {
     //PI制御したい
     Eigen::Vector3d i_gain(0.00005, 0.001, 0.001);
+    double i_angle_gain = 0.;
+    
     Eigen::Vector3d p_gain(0.00000, 0.000, 0.000);
+    double p_angle_gain = 0.;
+
     double target_maker_area = 10000;
 
     if(deviations_array_.size()>0)
     {
-        double i_dev_x = 0;
-        double i_dev_y = 0;
-        double i_dev_z = 0;
-        double i_dev_angle = 0;
+        double i_dev_x = 0.;
+        double i_dev_y = 0.;
+        double i_dev_z = 0.;
+        double i_dev_angle = 0.;
 
         for(int i = 0 ; i<deviations_array_.size() ;i++)
         {
             i_dev_x += deviations_array_[i].x;
             i_dev_y += deviations_array_[i].y;
+            i_dev_angle = deviations_array_[i].angle;
         }
 
         i_dev_x = i_dev_x/deviations_array_.size();
         i_dev_y = i_dev_y/deviations_array_.size();
+        i_dev_angle = i_dev_angle/deviations_array_.size();
          
         ardrone_vel_.linear.x = 0.;
         ardrone_vel_.linear.y = i_gain[1] *i_dev_x + p_gain[1] * deviations_array_[deviations_array_.size() - 1].x;
         ardrone_vel_.linear.z = i_gain[2] *i_dev_y + p_gain[2] * deviations_array_[deviations_array_.size() - 1].y;
-        ardrone_vel_.angular.z = 0.;
+        ardrone_vel_.angular.z = i_dev_angle* i_angle_gain + p_angle_gain * deviations_array_[deviations_array_.size() - 1].angle;
 
     }
 
