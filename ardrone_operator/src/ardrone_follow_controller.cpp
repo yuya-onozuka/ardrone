@@ -80,6 +80,7 @@ ArdroneFollowController::ArdroneFollowController()
     takeoff_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/takeoff",1);
     land_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/land",1);
     vel_pub_ = n_.advertise<geometry_msgs::Twist>("/cmd_vel",10);
+    takeoff_flag_ = false;
     land_flag_ = false;
     time_duration_threshold_ = 1.;
 
@@ -192,7 +193,7 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
         ROS_INFO("unko_vel");
     }
 
-    if(occupied_area_ratio_red > 0.3 && takeoff_flag_ == NULL)
+    if(occupied_area_ratio_red > 0.3 && takeoff_flag_ == false)
     {
         takeoff_pub_.publish(empty_msg_);
         takeoff_flag_ = true;
@@ -202,7 +203,7 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
 
 void ArdroneFollowController::computeVelocity()
 {
-    Eigen::Vector3d gain(0.00005, 0.001, 0.001);
+    Eigen::Vector3d gain(0.00005, 0.0005, 0.0005);
     double target_maker_area = 10000;
 
     average_deviation_x_image_ = (average_deviation_x_image_*(time_counter_ - 1) + target_marker_point_.x - state_marker_point_.x)/time_counter_;
@@ -219,7 +220,7 @@ void ArdroneFollowController::computeVelocity()
 
 void ArdroneFollowController::hoveringGradually()
 {
-    Eigen::Vector3d gain(0.00005, 0.001, 0.001);
+    Eigen::Vector3d gain(0.00005, 0.0005, 0.0005);
     ardrone_vel_.linear.x = 0.;
     ardrone_vel_.linear.y = gain[1] * (average_deviation_x_image_);
     ardrone_vel_.linear.z = gain[2] * (average_deviation_y_image_);
