@@ -58,38 +58,38 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     cv::eigen2cv(eigen_camera_matrix_, camera_matrix);
     cv::eigen2cv(eigen_dist_coeffs_, distortion_coefficients);
 
-    std::vector<Eigen::Matrix4d> rt_matrixes = emp_->estimateMarkersPose(input_image_, camera_matrix, distortion_coefficients, marker_size_);
+    rt_matrixes_ = emp_->estimateMarkersPose(input_image_, camera_matrix, distortion_coefficients, marker_size_);
 
-    if(rt_matrixes.size()>0)
+    if(rt_matrixes_.size()>0)
     {
-        // targetはひとつだけ
-        state_marker_point_ = ProjectPointToImage::project_point_to_image(eigen_camera_matrix_, rt_matrixes[0], marker_coordinate_target_point_);
+        state_marker_point_ = ProjectPointToImage::project_point_to_image(eigen_camera_matrix_, rt_matrixes_[0], marker_coordinate_target_point_);
         cv::circle(emp_->draw_image_, cv::Point(state_marker_point_.x, state_marker_point_.y), 10, cv::Scalar(0,0,255), 3, 4);
     }
-
-    int height = input_image_.rows;
-    int width = input_image_.cols;
-    target_marker_point_.x = width / 2;
-    target_marker_point_.y = height / 2;
     
-    ROS_INFO("width = %d",width);
-    ROS_INFO("height = %d",height);
-    ROS_INFO("ardrone_vel_x = %lf",ardrone_vel_.linear.x);
-    ROS_INFO("ardrone_vel_y = %lf",ardrone_vel_.linear.y);
-    ROS_INFO("ardrone_vel_z = %lf",ardrone_vel_.linear.z);
-
     sensor_msgs::ImagePtr draw_img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", emp_->draw_image_).toImageMsg();
     draw_image_pub_.publish(draw_img_msg);
+    
+    if(is_flying_==true)
+    {
+        computeDeviation();
+        computeVelocity();
+        // ROS_INFO("ardrone_vel_x = %lf",ardrone_vel_.linear.x);
+        // ROS_INFO("ardrone_vel_y = %lf",ardrone_vel_.linear.y);
+        // ROS_INFO("ardrone_vel_z = %lf",ardrone_vel_.linear.z);    
+        vel_pub_.publish(ardrone_vel_);
+    }
+}
 
-    //過去5個の平均
+void ArdroneFollowController::computeDeviation()
+{
     deviation_factors new_factor;
 
-    if(rt_matrixes.size() > 0)
+    if(rt_matrixes_.size() > 0)
     {
         new_factor.x = target_marker_point_.x - state_marker_point_.x;
         new_factor.y = target_marker_point_.y - state_marker_point_.y;
-        new_factor.z = rt_matrixes[0](2,3) - target_distance_;
-        new_factor.angle = atan(-rt_matrixes[0](0,3)/(rt_matrixes[0](2,3) + 0.00001));
+        new_factor.z = rt_matrixes_[0](2,3) - target_distance_;
+        new_factor.angle = atan(-rt_matrixes_[0](0,3)/(rt_matrixes_[0](2,3) + 0.00001));
         new_factor.time = ros::Time::now().toSec();
     }
     else
@@ -112,13 +112,6 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     else
     {
          deviations_array_.push_back(new_factor);
-    }
-    
-    
-    if(is_flying_==true)
-    {
-        ArdroneFollowController::computeVelocity();      
-        vel_pub_.publish(ardrone_vel_);
     }
 }
 

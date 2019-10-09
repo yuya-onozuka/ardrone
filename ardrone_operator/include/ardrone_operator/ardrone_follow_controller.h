@@ -30,6 +30,7 @@ private:
     void loadParameters();
     void navdataCallback(const ardrone_autonomy::Navdata::ConstPtr& navdata_msg);
     void imageCallback(const sensor_msgs::Image::ConstPtr& image_msg);
+    void computeDeviation();
     void computeVelocity();
 
     //ros 
@@ -80,8 +81,9 @@ private:
     double i_angle_gain_;
     double p_angle_gain_;
     
-    // estimate marker pose instance 
+    // estimate marker pose
     std::unique_ptr<EstimateMarkerPose> emp_;
+    std::vector<Eigen::Matrix4d> rt_matrixes_;
 };
 
 #endif // ARDRONE_FOLLOW_CONTROLLER_H_

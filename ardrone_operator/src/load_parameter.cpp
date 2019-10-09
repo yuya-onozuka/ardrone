@@ -9,9 +9,13 @@ void ArdroneFollowController::loadParameters()
     std::vector<double> target_point;
     std::vector<double> p_gain;
     std::vector<double> i_gain;
+    int image_width;
+    int image_height;
 
     private_nh.getParam("camera_matrix/data", camera_mat);
     private_nh.getParam("distortion_coefficients/data", dist_coeffs);
+    private_nh.getParam("image_width", image_width);
+    private_nh.getParam("image_height", image_height);
     private_nh.getParam("target/marker_size", marker_size_);
     private_nh.getParam("target/target_distance", target_distance_);
     private_nh.getParam("target/target_point", target_point);
@@ -20,6 +24,9 @@ void ArdroneFollowController::loadParameters()
     private_nh.getParam("controller/p_angle_gain", p_angle_gain_);
     private_nh.getParam("controller/i_angle_gain", i_angle_gain_);
     private_nh.getParam("controller/historical_deviation_number", historical_deviation_num_);
+
+    target_marker_point_.x = image_width / 2;
+    target_marker_point_.y = image_height / 2;
 
     // std::vectorからEigen::Matrix, Eigen::Vectorに変換
     for(int row = 0; row < 3; row++)
