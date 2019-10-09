@@ -38,7 +38,7 @@ void ArdroneFollowController::navdataCallback(const ardrone_autonomy::Navdata::C
         }
         is_flying_ = false;
     }
-    ROS_INFO("ardrone_state: %d", ardrone_state_);
+    // ROS_INFO("ardrone_state: %d", ardrone_state_);
 }
 
 void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& image_msg)
