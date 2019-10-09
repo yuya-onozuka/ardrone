@@ -25,6 +25,7 @@ $ rosrun ardrone_operator adrone_follow_controller
 ```
 
 ## 参考サイト
+- [ardrone_autonomy](https://ardrone-autonomy.readthedocs.io/en/latest/)
 - [移動する物体を追跡する](https://cvtech.cc/tracking/)
 - [カメラキャリブレーションと3次元再構成](http://opencv.jp/opencv-2svn/cpp/camera_calibration_and_3d_reconstruction.html#cv-solvepnp)
 - [ROS講座66 カメラのキャリブレーションを行う](https://qiita.com/srs/items/416aa78f2c679ddb7c52)
