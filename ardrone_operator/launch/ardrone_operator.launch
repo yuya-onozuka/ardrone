@@ -8,5 +8,5 @@
         <rosparam command="load" file="$(find ardrone_operator)/param/camera.yaml"/>
         <rosparam command="load" file="$(find ardrone_operator)/param/ardrone_follow_controller_param.yaml"/>
     </node>
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ardrone_operator)/config/ardrone.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ardrone_operator)/config/ardrone.rviz"/>
 </launch>
