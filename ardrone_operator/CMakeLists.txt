@@ -144,6 +144,7 @@ add_library(ardrone_operator
   src/red_extraction.cpp
   src/estimate_marker_pose.cpp
   src/target_image_point.cpp
+  src/load_parameter.cpp
 )
 target_link_libraries(ardrone_operator
   ${catkin_LIBRARIES}

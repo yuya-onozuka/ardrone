@@ -1,80 +1,7 @@
-#include "ros/ros.h"
-#include "sensor_msgs/Image.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
-#include <std_msgs/Header.h>
-#include <std_msgs/Empty.h>
-#include <geometry_msgs/Twist.h>
-#include <vector>
-#include <cmath>
-#include <Eigen/Dense>
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/eigen.hpp>
-
+#include <ardrone_operator/ardrone_follow_controller.h>
 #include <ardrone_operator/calc_area_in_contour.h>
 #include <ardrone_operator/red_extraction.h>
-#include <ardrone_operator/estimate_marker_pose.h>
 #include <ardrone_operator/target_image_point.h>
-
-
-class ArdroneFollowController
-{
-public:
-    ArdroneFollowController();
-    ~ArdroneFollowController();
-
-private:
-    void imageCallback(const sensor_msgs::Image::ConstPtr& msg);
-    void computeVelocity();
-
-    //ros 
-    ros::NodeHandle n_;
-    ros::Publisher takeoff_pub_;
-    ros::Publisher land_pub_;
-    ros::Publisher vel_pub_;
-    image_transport::Publisher gray_image_pub_;
-    image_transport::Publisher draw_image_pub_;
-    image_transport::Subscriber image_sub_;
-    std_msgs::Empty empty_msg_;
-    geometry_msgs::Twist ardrone_vel_;
-
-    bool takeoff_flag_;
-
-    cv::Mat input_image_;
-    
-    int deviation_number_threshold_;
-    struct deviation_factors
-    {
-        double x;
-        double y;
-        double z;
-        double angle;
-        double time;
-    };
-    std::vector<deviation_factors> deviations_array_;
-
-    double state_marker_area_;
-    cv::Point2i state_marker_point_;
-    cv::Point2i target_marker_point_;
-
-    // camera parameter
-    Eigen::Matrix3d eigen_camera_matrix_;
-    Eigen::VectorXd eigen_dist_coeffs_;
-
-    Eigen::Vector4d marker_coodinate_target_point_;
-
-    //control parameter
-    Eigen::Vector3d i_gain_;
-    Eigen::Vector3d p_gain_;
-    double i_angle_gain_;
-    double p_angle_gain_;
-    double target_distance_;
-    
-    // estimate marker pose instance 
-    std::unique_ptr<EstimateMarkerPose> emp_;
-};
 
 ArdroneFollowController::ArdroneFollowController()
 {
@@ -86,26 +13,9 @@ ArdroneFollowController::ArdroneFollowController()
     takeoff_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/takeoff",1);
     land_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/land",1);
     vel_pub_ = n_.advertise<geometry_msgs::Twist>("/cmd_vel",10);
+
     takeoff_flag_ = false;
-
-    deviation_number_threshold_ = 15;
-
-    // camera parameter
-    eigen_camera_matrix_ << 553.627733, 0.000000, 317.448667, 
-                            0.000000, 550.558377, 122.189254, 
-                            0.000000, 0.000000, 1.000000;
-    eigen_dist_coeffs_.resize(5);
-    eigen_dist_coeffs_ << -0.519086, 0.331704, 0.013667, 0.002975, 0.000000;
-
-    marker_coodinate_target_point_ << 0., 0., 0., 1.;
-
-    // control parameter(drone coordinate)
-    i_gain_ << 0.6, 0.000, 0.002;
-    p_gain_ << 0.3, 0.000, 0.002;
-    i_angle_gain_ = 1.8;
-    p_angle_gain_ = 1.0;
-    target_distance_ = 0.7;
-
+    loadParameters();
     emp_.reset(new EstimateMarkerPose());
 }
 
@@ -130,12 +40,12 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     cv::eigen2cv(eigen_camera_matrix_, camera_matrix);
     cv::eigen2cv(eigen_dist_coeffs_, distortion_coefficients);
 
-    std::vector<Eigen::Matrix4d> rt_matrixes = emp_->estimateMarkersPose(input_image_, camera_matrix, distortion_coefficients, 0.15);
+    std::vector<Eigen::Matrix4d> rt_matrixes = emp_->estimateMarkersPose(input_image_, camera_matrix, distortion_coefficients, marker_size_);
 
     if(rt_matrixes.size()>0)
     {
         // targetはひとつだけ
-        state_marker_point_ = TargetImagePoint::target_image_point(eigen_camera_matrix_, rt_matrixes[0], marker_coodinate_target_point_);
+        state_marker_point_ = TargetImagePoint::target_image_point(eigen_camera_matrix_, rt_matrixes[0], marker_coordinate_target_point_);
         cv::circle(emp_->draw_image_, cv::Point(state_marker_point_.x, state_marker_point_.y), 10, cv::Scalar(0,0,255), 3, 4);
     }
 
@@ -185,13 +95,13 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
         new_factor.time = ros::Time::now().toSec();
     }
 
-    if(deviations_array_.size() == deviation_number_threshold_)
+    if(deviations_array_.size() == historical_deviation_num_)
     {
-        for (int i = 0; i<deviation_number_threshold_ - 1; i++)
+        for (int i = 0; i<historical_deviation_num_ - 1; i++)
         {
             deviations_array_[i] = deviations_array_[i+1];
         }
-        deviations_array_[deviation_number_threshold_ - 1] = new_factor;
+        deviations_array_[historical_deviation_num_ - 1] = new_factor;
     }
     else
     {
