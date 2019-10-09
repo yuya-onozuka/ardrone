@@ -7,6 +7,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+#include <ardrone_autonomy/Navdata.h>
 #include <std_msgs/Header.h>
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/Twist.h>
@@ -27,7 +28,8 @@ public:
 
 private:
     void loadParameters();
-    void imageCallback(const sensor_msgs::Image::ConstPtr& msg);
+    void navdataCallback(const ardrone_autonomy::Navdata::ConstPtr& navdata_msg);
+    void imageCallback(const sensor_msgs::Image::ConstPtr& image_msg);
     void computeVelocity();
 
     //ros 
@@ -37,11 +39,15 @@ private:
     ros::Publisher vel_pub_;
     image_transport::Publisher gray_image_pub_;
     image_transport::Publisher draw_image_pub_;
+
+    ros::Subscriber navdata_sub_;
     image_transport::Subscriber image_sub_;
+
     std_msgs::Empty empty_msg_;
     geometry_msgs::Twist ardrone_vel_;
 
-    bool takeoff_flag_;
+    bool is_flying_;
+    unsigned int ardrone_state_;
 
     // variables for PID control
     int historical_deviation_num_;

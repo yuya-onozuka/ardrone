@@ -1,20 +1,22 @@
 #include <ardrone_operator/ardrone_follow_controller.h>
 #include <ardrone_operator/calc_area_in_contour.h>
 #include <ardrone_operator/red_extraction.h>
-#include <ardrone_operator/target_image_point.h>
+#include <ardrone_operator/project_point_to_image.h>
 
 ArdroneFollowController::ArdroneFollowController()
 {
-    //ros pub sub
     image_transport::ImageTransport it(n_);
+
+    navdata_sub_ = n_.subscribe("/ardrone/navdata", 1, &ArdroneFollowController::navdataCallback, this);
     image_sub_ = it.subscribe("/ardrone/front/image_raw", 1, &ArdroneFollowController::imageCallback, this);
+
     gray_image_pub_ = it.advertise("/red_detection_image", 10);
     draw_image_pub_ = it.advertise("/estimate_pose_image",10);
     takeoff_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/takeoff",1);
     land_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/land",1);
     vel_pub_ = n_.advertise<geometry_msgs::Twist>("/cmd_vel",10);
 
-    takeoff_flag_ = false;
+    is_flying_ = false;
     loadParameters();
     emp_.reset(new EstimateMarkerPose());
 }
@@ -23,11 +25,22 @@ ArdroneFollowController::~ArdroneFollowController()
 {
 }
 
-void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& msg)
+void ArdroneFollowController::navdataCallback(const ardrone_autonomy::Navdata::ConstPtr& navdata_msg)
+{
+    ardrone_state_ = navdata_msg->state;
+    //state = 0:Unknown 1:Init 2:Landed 3:Flying 4:Hovering 5:Test 6:Taking off 7:Goto Fix Point 8: Landing 9: Looping
+    if(ardrone_state_ == 3 || ardrone_state_ == 4 || ardrone_state_ == 7)
+    {
+        is_flying_ = true;
+    }
+    ROS_INFO("ardrone_state: %d", ardrone_state_);
+}
+
+void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& image_msg)
 {
 	try
     {
-        input_image_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
+        input_image_ = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
 	}
 	//error
 	catch (cv_bridge::Exception& e)
@@ -45,7 +58,7 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     if(rt_matrixes.size()>0)
     {
         // targetはひとつだけ
-        state_marker_point_ = TargetImagePoint::target_image_point(eigen_camera_matrix_, rt_matrixes[0], marker_coordinate_target_point_);
+        state_marker_point_ = ProjectPointToImage::project_point_to_image(eigen_camera_matrix_, rt_matrixes[0], marker_coordinate_target_point_);
         cv::circle(emp_->draw_image_, cv::Point(state_marker_point_.x, state_marker_point_.y), 10, cv::Scalar(0,0,255), 3, 4);
     }
 
@@ -61,10 +74,12 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     target_marker_point_.x = width / 2;
     target_marker_point_.y = height / 2;
 
-    double occupied_area_ratio_red = state_marker_area_ / (width * height);
+    double red_area = state_marker_area_ / (width * height);
     
     ROS_INFO("occupied_area_red = %lf",state_marker_area_);
-    ROS_INFO("occupied_area_ratio_red = %lf",occupied_area_ratio_red);
+    ROS_INFO("red_area = %lf",red_area);
+    ROS_INFO("width = %d",width);
+    ROS_INFO("height = %d",height);
     ROS_INFO("ardrone_vel_x = %lf",ardrone_vel_.linear.x);
     ROS_INFO("ardrone_vel_y = %lf",ardrone_vel_.linear.y);
     ROS_INFO("ardrone_vel_z = %lf",ardrone_vel_.linear.z);
@@ -109,18 +124,18 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
     }
     
     
-    if(takeoff_flag_==true)
+    if(is_flying_==true)
     {
         ArdroneFollowController::computeVelocity();      
         vel_pub_.publish(ardrone_vel_);
     }
 
-    if(occupied_area_ratio_red > 0.3 && takeoff_flag_ == false)
-    {
-        takeoff_pub_.publish(empty_msg_);
-        takeoff_flag_ = true;
-        ROS_INFO("takeoff");
-    }
+    // if(red_area > 0.3 && is_flying_ == false)
+    // {
+    //     takeoff_pub_.publish(empty_msg_);
+    //     is_flying_ = true;
+    //     ROS_INFO("takeoff");
+    // }
 }
 
 void ArdroneFollowController::computeVelocity()

@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   cmake_modules
+  ardrone_autonomy
  
 )
 
@@ -123,6 +124,7 @@ catkin_package(
   roscpp 
   rospy 
   std_msgs
+  ardrone_autonomy
 #  DEPENDS system_lib
 )
 
@@ -143,7 +145,7 @@ add_library(ardrone_operator
   src/calc_area_in_contour.cpp
   src/red_extraction.cpp
   src/estimate_marker_pose.cpp
-  src/target_image_point.cpp
+  src/project_point_to_image.cpp
   src/load_parameter.cpp
 )
 target_link_libraries(ardrone_operator
