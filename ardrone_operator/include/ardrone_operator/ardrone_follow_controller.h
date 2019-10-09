@@ -37,7 +37,6 @@ private:
     ros::Publisher takeoff_pub_;
     ros::Publisher land_pub_;
     ros::Publisher vel_pub_;
-    image_transport::Publisher gray_image_pub_;
     image_transport::Publisher draw_image_pub_;
 
     ros::Subscriber navdata_sub_;
@@ -63,7 +62,6 @@ private:
 
     // image
     cv::Mat input_image_;
-    double state_marker_area_;
     cv::Point2i state_marker_point_;
     cv::Point2i target_marker_point_;
 

@@ -26,7 +26,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(cmake_modules REQUIRED)
 
-
+find_package(Eigen3 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -121,11 +121,12 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ardrone_operator
   CATKIN_DEPENDS
-  roscpp 
-  rospy 
-  std_msgs
-  ardrone_autonomy
-#  DEPENDS system_lib
+    roscpp 
+    rospy 
+    std_msgs
+    ardrone_autonomy
+  DEPENDS
+    EIGEN3
 )
 
 ###########
@@ -138,6 +139,7 @@ include_directories(
   include
   src
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library

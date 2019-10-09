@@ -1,6 +1,4 @@
 #include <ardrone_operator/ardrone_follow_controller.h>
-#include <ardrone_operator/calc_area_in_contour.h>
-#include <ardrone_operator/red_extraction.h>
 #include <ardrone_operator/project_point_to_image.h>
 
 ArdroneFollowController::ArdroneFollowController()
@@ -10,7 +8,6 @@ ArdroneFollowController::ArdroneFollowController()
     navdata_sub_ = n_.subscribe("/ardrone/navdata", 1, &ArdroneFollowController::navdataCallback, this);
     image_sub_ = it.subscribe("/ardrone/front/image_raw", 1, &ArdroneFollowController::imageCallback, this);
 
-    gray_image_pub_ = it.advertise("/red_detection_image", 10);
     draw_image_pub_ = it.advertise("/estimate_pose_image",10);
     takeoff_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/takeoff",1);
     land_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/land",1);
@@ -32,6 +29,14 @@ void ArdroneFollowController::navdataCallback(const ardrone_autonomy::Navdata::C
     if(ardrone_state_ == 3 || ardrone_state_ == 4 || ardrone_state_ == 7)
     {
         is_flying_ = true;
+    }
+    else if(ardrone_state_ == 2 || ardrone_state_ == 8)
+    {
+        for(int i = 0; i < deviations_array_.size(); i++)
+        {
+            deviations_array_.pop_back();
+        }
+        is_flying_ = false;
     }
     ROS_INFO("ardrone_state: %d", ardrone_state_);
 }
@@ -62,30 +67,16 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
         cv::circle(emp_->draw_image_, cv::Point(state_marker_point_.x, state_marker_point_.y), 10, cv::Scalar(0,0,255), 3, 4);
     }
 
-    //赤色を抽出して白黒画像に変換
-    cv::Mat red_extract_image = RedExtraction::extractRedFrom(input_image_);
-    //最も面積が大きい輪郭の面積
-    state_marker_area_ = CalcAreaInContour::calcAreaInContour(red_extract_image);
-    // 最も面積が大きい輪郭の重心
-    // state_marker_pos_ = CalcAreaInContour::calcCentroidInContour(red_extract_image);
-
     int height = input_image_.rows;
     int width = input_image_.cols;
     target_marker_point_.x = width / 2;
     target_marker_point_.y = height / 2;
-
-    double red_area = state_marker_area_ / (width * height);
     
-    ROS_INFO("occupied_area_red = %lf",state_marker_area_);
-    ROS_INFO("red_area = %lf",red_area);
     ROS_INFO("width = %d",width);
     ROS_INFO("height = %d",height);
     ROS_INFO("ardrone_vel_x = %lf",ardrone_vel_.linear.x);
     ROS_INFO("ardrone_vel_y = %lf",ardrone_vel_.linear.y);
     ROS_INFO("ardrone_vel_z = %lf",ardrone_vel_.linear.z);
-
- 	sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", red_extract_image).toImageMsg();
- 	gray_image_pub_.publish(img_msg);
 
     sensor_msgs::ImagePtr draw_img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", emp_->draw_image_).toImageMsg();
     draw_image_pub_.publish(draw_img_msg);
@@ -129,13 +120,6 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
         ArdroneFollowController::computeVelocity();      
         vel_pub_.publish(ardrone_vel_);
     }
-
-    // if(red_area > 0.3 && is_flying_ == false)
-    // {
-    //     takeoff_pub_.publish(empty_msg_);
-    //     is_flying_ = true;
-    //     ROS_INFO("takeoff");
-    // }
 }
 
 void ArdroneFollowController::computeVelocity()
