@@ -46,12 +46,12 @@ void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& 
 	try
     {
         input_image_ = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
-	}
+    }
 	//error
 	catch (cv_bridge::Exception& e)
     {
-		ROS_ERROR("cv_bridge exception: %s", e.what());
-	}
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+    }
 
     cv::Mat camera_matrix;
     cv::Mat distortion_coefficients;
@@ -160,5 +160,5 @@ int main(int argc, char** argv)
     ArdroneFollowController follow;
 
     ros::spin();
- 	return 0;
+    return 0;
 }
