@@ -153,7 +153,7 @@ void ArdroneFollowController::computeVelocity()
 
 int main(int argc, char** argv)
 {
- 	ros::init (argc, argv, "ardrone_follow_controller");
+    ros::init (argc, argv, "ardrone_follow_controller");
     ros::NodeHandle n;
     ros::Rate rate(10);
 
