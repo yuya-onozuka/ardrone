@@ -20,8 +20,9 @@ $ roslaunch ardrone_operator ardrone_record.launch bagfile_name:=filename
 $ roslaunch ardrone_operator ardrone_play.launch bagfile_name:=filename
 ```
 ### マーカー追従制御
+- ドライバー、キーボード操作、追従制御プログラムを立ち上げる。
 ```
-$ rosrun ardrone_operator adrone_follow_controller
+$ roslaunch ardrone_operator adrone_operator.launch
 ```
 
 ## 参考サイト
