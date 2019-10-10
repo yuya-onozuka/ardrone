@@ -72,7 +72,7 @@ class KeyboardOperation:
     
     def keyupCallback(self, key):
         if key.code == BACKSPACE:
-            self.pub_reset.publish(self.empty_msg)
+            # self.pub_reset.publish(self.empty_msg)
 
     def publish_vel(self):
         rate = rospy.Rate(10)
