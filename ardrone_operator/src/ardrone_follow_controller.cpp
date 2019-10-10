@@ -147,7 +147,6 @@ void ArdroneFollowController::computeVelocity()
         ardrone_vel_.linear.y = i_gain_[1] *i_factors.x + p_gain_[1] * p_factors.x;
         ardrone_vel_.linear.z = i_gain_[2] *i_factors.y + p_gain_[2] * p_factors.y;
         ardrone_vel_.angular.z = i_factors.angle* i_angle_gain_ + p_angle_gain_ * p_factors.angle;
-
     }
 }
 
