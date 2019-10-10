@@ -43,12 +43,12 @@ void ArdroneFollowController::navdataCallback(const ardrone_autonomy::Navdata::C
 
 void ArdroneFollowController::imageCallback(const sensor_msgs::Image::ConstPtr& image_msg)
 {
-	try
+    try
     {
         input_image_ = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
     }
-	//error
-	catch (cv_bridge::Exception& e)
+    //error
+    catch (cv_bridge::Exception& e)
     {
         ROS_ERROR("cv_bridge exception: %s", e.what());
     }
