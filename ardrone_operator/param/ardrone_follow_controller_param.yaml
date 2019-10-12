@@ -7,5 +7,5 @@ controller:
   p_gain: [0.3, 0.000, 0.002]        # drone coordinate
   i_gain: [0.6, 0.000, 0.002]        # drone coordinate
   p_angle_gain: 1.0
-  i_angle_gain: 1.8
+  i_angle_gain: 2.0
   historical_deviation_number: 15

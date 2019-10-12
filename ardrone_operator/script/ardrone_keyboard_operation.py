@@ -71,9 +71,8 @@ class KeyboardOperation:
             self.ardrone_vel.linear.y -= VELOCITY_INCLIMENT
     
     def keyupCallback(self, key):
-        if key.code == BACKSPACE:
-            # self.pub_reset.publish(self.empty_msg)
-
+        pass
+    
     def publish_vel(self):
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
