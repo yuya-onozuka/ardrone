@@ -55,7 +55,6 @@ class KeyboardOperation:
         elif key.code == BACKSPACE:
             toggle_cam_client()
             rospy.loginfo("toggle cam")
-            
 
         elif key.code == UP:
             self.ardrone_vel.linear.z += VELOCITY_INCLIMENT
