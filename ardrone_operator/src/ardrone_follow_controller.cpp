@@ -6,7 +6,7 @@ ArdroneFollowController::ArdroneFollowController()
     image_transport::ImageTransport it(n_);
 
     navdata_sub_ = n_.subscribe("/ardrone/navdata", 1, &ArdroneFollowController::navdataCallback, this);
-    image_sub_ = it.subscribe("/ardrone/front/image_raw", 1, &ArdroneFollowController::imageCallback, this);
+    image_sub_ = it.subscribe("/ardrone/image_raw", 1, &ArdroneFollowController::imageCallback, this);
 
     draw_image_pub_ = it.advertise("/estimate_pose_image",10);
     takeoff_pub_ = n_.advertise<std_msgs::Empty>("/ardrone/takeoff",1);

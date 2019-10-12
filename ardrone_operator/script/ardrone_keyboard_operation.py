@@ -5,6 +5,7 @@ import rospy
 from std_msgs.msg import Empty
 from geometry_msgs.msg import Twist
 from keyboard.msg import Key
+from ardrone_toggle_cam_client import toggle_cam_client
 
 UP = 273
 DOWN = 274
@@ -13,6 +14,7 @@ LEFT = 276
 ENTER = 13
 SPACE = 32
 BACKSPACE = 8
+ESCAPE = 27
 KEY_w = 119
 KEY_s = 115
 KEY_a = 97
@@ -47,9 +49,13 @@ class KeyboardOperation:
         elif key.code == SPACE:
             self.pub_land.publish(self.empty_msg)
             rospy.loginfo("land")
-        elif key.code == BACKSPACE:
+        elif key.code == ESCAPE:
             self.pub_reset.publish(self.empty_msg)
             rospy.loginfo("reset")
+        elif key.code == BACKSPACE:
+            toggle_cam_client()
+            rospy.loginfo("toggle cam")
+            
 
         elif key.code == UP:
             self.ardrone_vel.linear.z += VELOCITY_INCLIMENT
