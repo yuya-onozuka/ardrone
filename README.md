@@ -20,10 +20,18 @@ $ roslaunch ardrone_operator ardrone_record.launch bagfile_name:=filename
 $ roslaunch ardrone_operator ardrone_play.launch bagfile_name:=filename
 ```
 ### マーカー追従制御
-- ドライバー、キーボード操作、追従制御プログラムを立ち上げる。
+- ドライバー、キーボード操作、追従制御プログラムが立ち上がる。
+- OpenCVのArUco Markerライブラリを使っているため、ArUco Markerが必要。
+- [Online ArUco markers generator](https://www.google.com/search?q=aruco+create+marker&oq=aruco+create+&aqs=chrome.1.69i57j0l7.5733j0j7&sourceid=chrome&ie=UTF-8)
 ```
 $ roslaunch ardrone_operator adrone_operator.launch
 ```
+
+## 制御方法
+1. ArUco Markerを検出し、マーカーまでの距離を導出
+2. ArUco Markerの原点をカメラ画像に投影
+3. ArUco Markerの原点がカメラ画像の中心にくるようにドローンの上下移動、ヨー回転を制御
+4. ArUco Markerまでの距離を一定に保つようにドローンの前後移動を制御
 
 ## 参考サイト
 - [ardrone_autonomy](https://ardrone-autonomy.readthedocs.io/en/latest/)  
@@ -45,3 +53,4 @@ ArUco Markerライブラリの使い方。
 ArUco Markerを作る。
 - [ROSを始めよう　その３](https://qiita.com/hagi-suke/items/9158a2770db65ea3d4d0)  
 カメラを切り替えるためのclientを実装するときに参考にした。
+- [Finger Detection and Tracking using OpenCV and Python](https://github.com/amarlearning/Finger-Detection-and-Tracking)
