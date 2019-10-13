@@ -53,6 +53,8 @@ ArUco Markerライブラリの使い方。
 ArUco Markerを作る。
 - [ROSを始めよう　その３](https://qiita.com/hagi-suke/items/9158a2770db65ea3d4d0)  
 カメラを切り替えるためのclientを実装するときに参考にした。
+- [Getting both camera images at the same time](https://forum.developer.parrot.com/t/getting-both-camera-images-at-the-same-time/676)  
+ardroneで両方のカメラ画像を同時に取得するのは無理らしい。
 - [Finger Detection and Tracking using OpenCV and Python](https://github.com/amarlearning/Finger-Detection-and-Tracking)  
 - [The 20BN-jester Dataset V1](https://20bn.com/datasets/jester/v1)  
 ハンドジェスチャーのデータセット
