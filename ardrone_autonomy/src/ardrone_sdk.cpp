@@ -98,6 +98,7 @@ extern "C"
 
     ardrone_application_default_config.navdata_options = NAVDATA_OPTION_FULL_MASK;
     ardrone_application_default_config.video_channel = ZAP_CHANNEL_HORI;
+    // ardrone_application_default_config.video_channel = ZAP_CHANNEL_LARGE_HORI_SMALL_VERT;
     ardrone_application_default_config.control_level = (0 << CONTROL_LEVEL_COMBINED_YAW);
     ardrone_application_default_config.flying_mode = FLYING_MODE_FREE_FLIGHT;
 

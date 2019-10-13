@@ -481,11 +481,13 @@ void ARDroneDriver::PublishVideo()
   if (IS_ARDRONE2)
   {
     sensor_msgs::Image image_msg;
+    sensor_msgs::Image image_msg_bottom;
     sensor_msgs::Image::_data_type::iterator _it;
 
     if (cam_state == ZAP_CHANNEL_HORI)
     {
       image_msg.header.frame_id = drone_frame_front_cam;
+      image_msg_bottom.header.frame_id = drone_frame_bottom_cam;
     }
     else if (cam_state == ZAP_CHANNEL_VERT)
     {
@@ -509,7 +511,23 @@ void ARDroneDriver::PublishVideo()
     // We only put the width and height in here.
 
     cinfo_msg_hori.header.stamp = image_msg.header.stamp;
-    cinfo_msg_vert.header.stamp = image_msg.header.stamp;
+
+
+
+    image_msg_bottom.width = D2_STREAM_WIDTH;
+    image_msg_bottom.height = D2_STREAM_HEIGHT;
+    image_msg_bottom.encoding = "rgb8";
+    image_msg_bottom.is_bigendian = false;
+    image_msg_bottom.step = D2_STREAM_WIDTH * 3;
+    image_msg_bottom.data.resize(D2_STREAM_WIDTH * D2_STREAM_HEIGHT * 3);
+    if (!realtime_video) vp_os_mutex_lock(&video_lock);
+    image_msg_bottom.header.stamp = shared_video_receive_time;
+    std::copy(buffer, buffer + (D2_STREAM_WIDTH * D2_STREAM_HEIGHT * 3), image_msg_bottom.data.begin());
+    if (!realtime_video) vp_os_mutex_unlock(&video_lock);
+    // We only put the width and height in here.
+
+   
+    cinfo_msg_vert.header.stamp = image_msg_bottom.header.stamp;
 
     if (cam_state == ZAP_CHANNEL_HORI)
     {
@@ -520,6 +538,11 @@ void ARDroneDriver::PublishVideo()
       cinfo_msg_hori.height = D2_STREAM_HEIGHT;
       image_pub.publish(image_msg, cinfo_msg_hori);  // /ardrone
       hori_pub.publish(image_msg, cinfo_msg_hori);
+
+      cinfo_msg_vert.width = D2_STREAM_WIDTH;
+      cinfo_msg_vert.height = D2_STREAM_HEIGHT;
+      vert_pub.publish(image_msg_bottom, cinfo_msg_vert);
+      
     }
     else if (cam_state == ZAP_CHANNEL_VERT)
     {
