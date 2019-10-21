@@ -1,5 +1,23 @@
 # ardrone  
-## 実行方法
+## ardrone_autonomy
+公式のardrone driver  
+ROS Wiki：http://wiki.ros.org/ardrone_autonomy  
+Documents:https://ardrone-autonomy.readthedocs.io/en/latest/  
+### ドライバ起動
+```
+$ roslaunch ardrone_autonomy ardrone.lanuch
+```
+
+## tum_ardrone
+ROS Wiki:https://wiki.ros.org/tum_ardrone
+```
+$ roslaunch tum_ardrone ardrone_driver.launch
+$ roslaunch tum_ardrone tum_ardrone.launch
+```
+
+## ardrone_operator
+* キーボード操作
+* ArUco Markerへの追従
 ### ドライバ起動
 ```
 $ roslaunch ardrone_autonomy ardrone.launch
@@ -26,14 +44,13 @@ $ roslaunch ardrone_operator ardrone_play.launch bagfile_name:=filename
 ```
 $ roslaunch ardrone_operator adrone_operator.launch
 ```
-
-## 制御方法
+### 制御方法
 1. ArUco Markerを検出し、マーカーまでの距離を導出
 2. ArUco Markerの原点をカメラ画像に投影
 3. ArUco Markerの原点がカメラ画像の中心にくるようにドローンの上下移動、ヨー回転を制御
 4. ArUco Markerまでの距離を一定に保つようにドローンの前後移動を制御
 
-## 参考サイト
+### 参考サイト
 - [ardrone_autonomy](https://ardrone-autonomy.readthedocs.io/en/latest/)  
 ardrone_autonomyパッケージのドキュメント。
 - [移動する物体を追跡する](https://cvtech.cc/tracking/)  
