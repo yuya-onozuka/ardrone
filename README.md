@@ -42,6 +42,7 @@ $ roslaunch ardrone_operator ardrone_play.launch bagfile_name:=filename
 - ドライバー、キーボード操作、追従制御プログラムが立ち上がる。
 - OpenCVのArUco Markerライブラリを使っているため、ArUco Markerが必要。
 - [Online ArUco markers generator](https://www.google.com/search?q=aruco+create+marker&oq=aruco+create+&aqs=chrome.1.69i57j0l7.5733j0j7&sourceid=chrome&ie=UTF-8)
+- ardrone_follow_controller_param.yamlでパラメータを設定（生成したArUco Markerのサイズを指定する必要がある）。
 ```
 $ roslaunch ardrone_operator adrone_operator.launch
 ```
