@@ -1,15 +1,16 @@
 # ardrone  
 ## ardrone_autonomy
 公式のardrone driver  
-ROS Wiki：http://wiki.ros.org/ardrone_autonomy  
-Documents:https://ardrone-autonomy.readthedocs.io/en/latest/  
+ROS Wiki： http://wiki.ros.org/ardrone_autonomy  
+Documents: https://ardrone-autonomy.readthedocs.io/en/latest/  
 ### ドライバ起動
 ```
 $ roslaunch ardrone_autonomy ardrone.lanuch
 ```
 
 ## tum_ardrone
-ROS Wiki:https://wiki.ros.org/tum_ardrone
+visual SLAM(PTAM)で作ったマップ情報をもとに制御できるみたい？  
+ROS Wiki: https://wiki.ros.org/tum_ardrone
 ```
 $ roslaunch tum_ardrone ardrone_driver.launch
 $ roslaunch tum_ardrone tum_ardrone.launch

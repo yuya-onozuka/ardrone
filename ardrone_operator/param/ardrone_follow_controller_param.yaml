@@ -1,11 +1,23 @@
 target:
   marker_size: 0.15                  # [m]
-  target_distance: 0.7               # distance between marker and drone [m]
+  target_distance: 0.6               # distance between marker and drone [m]
   target_point: [0., 0., 0., 1.]     # marker coordinate
 
 controller:
   p_gain: [0.3, 0.000, 0.002]        # drone coordinate
-  i_gain: [0.6, 0.000, 0.002]        # drone coordinate
-  p_angle_gain: 1.0
+  i_gain: [0.4, 0.000, 0.002]        # drone coordinate
+  p_angle_gain: 1.5
   i_angle_gain: 2.0
   historical_deviation_number: 15
+
+# target:
+#   marker_size: 0.15                  # [m]
+#   target_distance: 0.7               # distance between marker and drone [m]
+#   target_point: [0., 0., 0., 1.]     # marker coordinate
+
+# controller:
+#   p_gain: [0.3, 0.000, 0.002]        # drone coordinate
+#   i_gain: [0.6, 0.000, 0.002]        # drone coordinate
+#   p_angle_gain: 1.0
+#   i_angle_gain: 2.0
+#   historical_deviation_number: 15
