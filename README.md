@@ -23,8 +23,9 @@ $ roslaunch ardrone_operator ardrone_demo_auto_pilot.launch
 ```
 2. txtファイルの選択
 * GUIのLoad Fileからtxtファイルを選択。
-3. auto pilotの開始
-GUI上の「Reset」→「Clear and Sebd」の順にボタンをクリックすると離陸し、PTAM(visual SLAM)のinitailizeを始める。initializeが成功すると自己位置を認識できるようになり、選択したtxtファイルのgotoコマンドの位置に動く。  
+3. auto pilotの開始  
+GUI上の「Reset」→「Clear and Sebd」の順にボタンをクリックすると離陸し、PTAM(visual SLAM)のinitailizeを始める。  
+initializeが成功すると自己位置を認識できるようになり、選択したtxtファイルのgotoコマンドの位置に動く。  
 goto x y z yaw → initializeした位置、姿勢からの相対位置、姿勢を指定。
 
 ## Pacakges
