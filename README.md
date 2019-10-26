@@ -1,5 +1,10 @@
 # ardrone  
 
+## Prerequisites
+* Ubuntu16.04 
+* ROS kinetic (ardrone_autonomy, tum_ardroneがkineticまでしか対応していない)
+* OpenCV 3.3.0
+
 ## Demo
 ### ArUco Marker follow control
 ArUco Markerにドローンを追従させる制御。
@@ -116,7 +121,4 @@ ardroneで両方のカメラ画像を同時に取得するのは無理らしい�
 - [厳密な重心の求め方](https://cvtech.cc/centroid/)  
 赤色のマーカーのmotionを認識するために、重心の軌道を使った。
 
-## Prerequisites
-* Ubuntu16.04 
-* ROS kinetic (ardrone_autonomy, tum_ardroneがkineticまでしか対応していない)
-* OpenCV 3.3.0
+
