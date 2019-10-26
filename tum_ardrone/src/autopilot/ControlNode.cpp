@@ -52,6 +52,7 @@ ControlNode::ControlNode()
     takeoff_channel = nh_.resolveName("ardrone/takeoff");
     land_channel = nh_.resolveName("ardrone/land");
     toggleState_channel = nh_.resolveName("ardrone/reset");
+	goto_channel = nh_.resolveName("tum_ardrone/goto");
 
 	packagePath = ros::package::getPath("tum_ardrone");
 
@@ -80,6 +81,7 @@ ControlNode::ControlNode()
 	takeoff_pub	   = nh_.advertise<std_msgs::Empty>(takeoff_channel,1);
 	land_pub	   = nh_.advertise<std_msgs::Empty>(land_channel,1);
 	toggleState_pub	   = nh_.advertise<std_msgs::Empty>(toggleState_channel,1);
+	goto_sub = nh_.subscribe(goto_channel,50, &ControlNode::gotoCb, this);
 
 	// services handler
 	setReference_ = nh_.advertiseService("drone_autopilot/setReference", &ControlNode::setReference, this);
@@ -171,6 +173,8 @@ void ControlNode::popNextCommand(const tum_ardrone::filter_stateConstPtr statePt
 		{
 			snprintf(buf,100, "%.3f %.3f %.3f %.3f",statePtr->x,statePtr->y,statePtr->z,statePtr->yaw);
 			command.replace(p,6,buf);
+			reference_flag_ = true;
+			
 		}
 		if((p = command.find("$REFERENCE$")) != std::string::npos)
 		{
@@ -207,6 +211,11 @@ void ControlNode::popNextCommand(const tum_ardrone::filter_stateConstPtr statePt
 		{
 			parameter_referenceZero = DronePosition(TooN::makeVector(parameters[0],parameters[1],parameters[2]),parameters[3]);
 			commandUnderstood = true;
+			if(reference_flag_ == true)
+			{
+				reference_flag_2 = true;
+			}
+			
 		}
 
 		// setMaxControl
@@ -341,6 +350,29 @@ void ControlNode::comCb(const std_msgs::StringConstPtr str)
 	{
 		this->toogleLogging();
 	}
+}
+
+void ControlNode::gotoCb(const std_msgs::Float32MultiArrayConstPtr goto_msg)
+{
+	if(currentKI == NULL && reference_flag_2 ==true)
+	{
+		if(goto_msg->data.size() == 4)
+		{
+			currentKI = new KIFlyTo(
+					DronePosition(
+					TooN::makeVector(goto_msg->data[0],goto_msg->data[1],goto_msg->data[2]) + parameter_referenceZero.pos,
+						goto_msg->data[3] + parameter_referenceZero.yaw),
+					parameter_StayTime,
+					parameter_MaxControl,
+					parameter_InitialReachDist,
+					parameter_StayWithinDist
+					);
+				currentKI->setPointers(this,&controller);
+				std::cout << 'kasu'<< std::endl;
+				// commandUnderstood = true;
+		}
+	}
+	
 }
 
 void ControlNode::Loop()

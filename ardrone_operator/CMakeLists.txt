@@ -184,6 +184,15 @@ target_link_libraries(estimate_marker_pose_test_node
 )
 target_link_libraries(estimate_marker_pose_test_node ${OpenCV_LIBRARIES})
 
+add_executable(receive_motion_node
+  src/receive_motion_node.cpp
+ )
+target_link_libraries(receive_motion_node
+  ${catkin_LIBRARIES}
+  ardrone_operator
+)
+target_link_libraries(receive_motion_node ${OpenCV_LIBRARIES})
+
 
 #target_link_libraries(ardrone_autonomy
 #  ${catkin_LIBRARIES}

@@ -22,10 +22,13 @@ image_transport::Publisher draw_image_pub;
 
 void imageCallback(const sensor_msgs::Image::ConstPtr& msg)
 {
+    //カメラの内部パラメータ
+    //カメラマトリクス
     Eigen::Matrix3d eigen_mat;
     eigen_mat << 553.627733, 0.000000, 317.448667, 
                 0.000000, 550.558377, 122.189254, 
                 0.000000, 0.000000, 1.000000;
+    //歪み補正
     Eigen::VectorXd eigen_coeffs(5);
     eigen_coeffs << -0.519086, 0.331704, 0.013667, 0.002975, 0.000000;
 

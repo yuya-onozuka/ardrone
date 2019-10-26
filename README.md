@@ -1,56 +1,93 @@
 # ardrone  
-## ardrone_autonomy
-公式のardrone driver  
+
+## Demo
+### ArUco Marker follow control
+ArUco Markerにドローンを追従させる制御。
+1. 準備
+- OpenCVのArUco Markerライブラリを使っているため、ArUco Markerを用意。
+- [Online ArUco markers generator](https://www.google.com/search?q=aruco+create+marker&oq=aruco+create+&aqs=chrome.1.69i57j0l7.5733j0j7&sourceid=chrome&ie=UTF-8)
+- ardrone_follow_controller_param.yamlでパラメータを設定（生成したArUco Markerのサイズを指定する必要がある）。
+
+2. デモ用のlaunchファイルを起動
+- ardrone driver、キーボード操作ノード、マーカー追従制御ノードを起動
+```
+$ roslaunch ardrone_operator ardrone_demo_follow.launch
+```
+
+### Auto Pilot
+visual SLAMにより自己位置を認識できるようにし、その情報をもとに位置制御。
+1. デモ用のlaunchファイルを起動
+```
+$ roslaunch ardrone_operator ardrone_demo_auto_pilot.launch
+```
+2. txtファイルの選択
+* GUIのLoad Fileからtxtファイルを選択。
+3. auto pilotの開始
+GUI上の「Reset」→「Clear and Sebd」の順にボタンをクリックすると離陸し、PTAM(visual SLAM)のinitailizeを始める。initializeが成功すると自己位置を認識できるようになり、選択したtxtファイルのgotoコマンドの位置に動く。  
+goto x y z yaw → initializeした位置、姿勢からの相対位置、姿勢を指定。
+
+## Pacakges
+### ardrone_autonomy
+公式のardrone driver。  
 ROS Wiki： http://wiki.ros.org/ardrone_autonomy  
 Documents: https://ardrone-autonomy.readthedocs.io/en/latest/  
-### ドライバ起動
+
+#### ドライバ起動
 ```
 $ roslaunch ardrone_autonomy ardrone.lanuch
 ```
 
-## tum_ardrone
-visual SLAM(PTAM)で作ったマップ情報をもとに制御できるみたい？  
-ROS Wiki: https://wiki.ros.org/tum_ardrone
+### tum_ardrone
+visual SLAM(PTAM)で作ったマップ情報をもとに制御。  
+ROS Wiki: https://wiki.ros.org/tum_ardrone  
+ジェスチャーに応じた指令値を送るために少しプログラムを修正した。
 ```
 $ roslaunch tum_ardrone ardrone_driver.launch
 $ roslaunch tum_ardrone tum_ardrone.launch
 ```
+ROS Wiki、gitのREADMEを参考にしてGUIを操作。
 
-## ardrone_operator
+### ardrone_operator
 * キーボード操作
 * ArUco Markerへの追従
-### ドライバ起動
+#### ドライバ起動
 ```
 $ roslaunch ardrone_autonomy ardrone.launch
 ```
-### キーボード操作
+#### キーボード操作
 ```
+$ roslaunch ardrone_autonomy ardrone.launch
 $ roslaunch ardrone_operator ardrone_keyboard_operation.launch
 ```
-### rosbag保存方法
+
+#### マーカー追従制御
+```
+$ roslaunch ardrone_autonomy ardrone.launch
+$ roslaunch ardrone_operator ardrone_follow_controller.launch
+```
+
+制御方法
+1. ArUco Markerを検出し、マーカーまでの距離を導出
+2. ArUco Markerの原点をカメラ画像に投影
+3. ArUco Markerの原点がカメラ画像の中心にくるようにドローンの上下移動、ヨー回転を制御
+4. ArUco Markerまでの距離を一定に保つようにドローンの前後移動を制御
+
+#### モーション認識
+```
+$ roslaunch ardrone_operator receive_motion.launch
+```
+
+#### rosbag保存方法
 - ardrone.launchを実行する必要なし。
 filenameはアルファベットから始める。
 ```
 $ roslaunch ardrone_operator ardrone_record.launch bagfile_name:=filename
 ```
-### rosbag実行方法
+#### rosbag実行方法
 - ardrone.launchは実行しない。
 ```
 $ roslaunch ardrone_operator ardrone_play.launch bagfile_name:=filename
 ```
-### マーカー追従制御
-- ドライバー、キーボード操作、追従制御プログラムが立ち上がる。
-- OpenCVのArUco Markerライブラリを使っているため、ArUco Markerが必要。
-- [Online ArUco markers generator](https://www.google.com/search?q=aruco+create+marker&oq=aruco+create+&aqs=chrome.1.69i57j0l7.5733j0j7&sourceid=chrome&ie=UTF-8)
-- ardrone_follow_controller_param.yamlでパラメータを設定（生成したArUco Markerのサイズを指定する必要がある）。
-```
-$ roslaunch ardrone_operator adrone_operator.launch
-```
-### 制御方法
-1. ArUco Markerを検出し、マーカーまでの距離を導出
-2. ArUco Markerの原点をカメラ画像に投影
-3. ArUco Markerの原点がカメラ画像の中心にくるようにドローンの上下移動、ヨー回転を制御
-4. ArUco Markerまでの距離を一定に保つようにドローンの前後移動を制御
 
 ### 参考サイト
 - [ardrone_autonomy](https://ardrone-autonomy.readthedocs.io/en/latest/)  
@@ -74,6 +111,10 @@ ArUco Markerを作る。
 カメラを切り替えるためのclientを実装するときに参考にした。
 - [Getting both camera images at the same time](https://forum.developer.parrot.com/t/getting-both-camera-images-at-the-same-time/676)  
 ardroneで両方のカメラ画像を同時に取得するのは無理らしい。
-- [Finger Detection and Tracking using OpenCV and Python](https://github.com/amarlearning/Finger-Detection-and-Tracking)  
-- [The 20BN-jester Dataset V1](https://20bn.com/datasets/jester/v1)  
-ハンドジェスチャーのデータセット
+- [厳密な重心の求め方](https://cvtech.cc/centroid/)  
+赤色のマーカーのmotionを認識するために、重心の軌道を使った。
+
+## Prerequisites
+* Ubuntu16.04 
+* ROS kinetic (ardrone_autonomy, tum_ardroneがkineticまでしか対応していない)
+* OpenCV 3.3.0

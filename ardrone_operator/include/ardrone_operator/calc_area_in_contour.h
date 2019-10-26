@@ -11,7 +11,7 @@ class CalcAreaInContour
 {
 public:
     static double calcAreaInContour(cv::Mat& image);
-    static Eigen::Vector2d calcCentroidInContour(cv::Mat& image);
+    static bool calcCentroidInContour(cv::Mat& image, cv::Point2f& centroid);
 
 private:
     std::vector<cv::Point> points_in_contour_;

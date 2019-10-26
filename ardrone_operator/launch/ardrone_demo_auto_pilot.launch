@@ -1,0 +1,16 @@
+<launch>
+    <include file = "$(find tum_ardrone)/launch/ardrone_driver.launch"/>
+    <include file = "$(find tum_ardrone)/launch/tum_ardrone.launch"/>
+
+    <node name="keyboard" pkg="keyboard" type="keyboard" output="screen" />
+    <node name="ardrone_keyboard_operation" pkg="ardrone_operator" type="ardrone_keyboard_operation.py" output="screen"/>
+
+    <!-- <node name="uvc_camera_node" pkg="uvc_camera" type="uvc_camera_node" >
+        <param name="device" type="string" value="/dev/video1"/>
+    </node>
+    <node name="image_view" pkg="image_view" type="image_view" >
+        <remap from="image" to="/detect_image"/>
+    </node>
+    <node name="receive_movement_node" pkg="ardrone_operator" type="receive_movement_node" /> -->
+
+</launch>

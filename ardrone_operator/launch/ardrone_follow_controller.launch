@@ -1,0 +1,8 @@
+<launch>
+    <node name="ardrone_follow_controller" pkg="ardrone_operator" type="ardrone_follow_controller" output="screen">
+        <!-- <rosparam command="load" file="$(find ardrone_operator)/param/camera.yaml"/> -->
+        <rosparam command="load" file="$(find ardrone_autonomy)/data/camera_info/ardrone_front.yaml"/>
+        <rosparam command="load" file="$(find ardrone_operator)/param/ardrone_follow_controller_param.yaml"/>
+    </node>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ardrone_operator)/config/ardrone.rviz"/>
+</launch>

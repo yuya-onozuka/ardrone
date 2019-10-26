@@ -18,10 +18,9 @@ cv::Mat RedExtraction::extractRedFrom(cv::Mat& image)
 
             r_rate = R/(1.0*(R+G+B));
  
-            if(r_rate>0.5)
+            if(r_rate>0.6)
             {
                 convert_image.at<unsigned char>(v,u) = 255;
-                // cv::cvtColor(ipt_image,red_image,CV_BGR2GRAY);
             }
             else
             { 

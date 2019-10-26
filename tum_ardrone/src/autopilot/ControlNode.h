@@ -29,6 +29,7 @@
 #include "tum_ardrone/AutopilotParamsConfig.h"
 #include "DroneController.h"
 #include "std_msgs/Empty.h"
+#include "std_msgs/Float32MultiArray.h"
 #include "std_srvs/Empty.h"
 
 #include "tum_ardrone/SetReference.h"
@@ -54,6 +55,7 @@ private:
 	ros::Publisher takeoff_pub;
 	ros::Publisher land_pub;
 	ros::Publisher toggleState_pub;
+	ros::Subscriber goto_sub;
 
 	ros::NodeHandle nh_;
 	static pthread_mutex_t tum_ardrone_CS;
@@ -63,6 +65,7 @@ private:
 	std::string control_channel;
 	std::string dronepose_channel;
 	std::string command_channel;
+	std::string goto_channel;
 	std::string packagePath;
 	std::string land_channel;
 	std::string takeoff_channel;
@@ -116,6 +119,8 @@ private:
 	void reSendInfo();
 	char buf[500];
 	ControlCommand lastSentControl;
+
+	
 public:
 	ControlNode();
 	~ControlNode();
@@ -124,6 +129,7 @@ public:
 	// ROS message callbacks
 	void droneposeCb(const tum_ardrone::filter_stateConstPtr statePtr);
 	void comCb(const std_msgs::StringConstPtr str);
+	void gotoCb(const std_msgs::Float32MultiArrayConstPtr str);
 	void dynConfCb(tum_ardrone::AutopilotParamsConfig &config, uint32_t level);
 
 	// main pose-estimation loop
@@ -151,5 +157,7 @@ public:
 	// other internals
 	long lastControlSentMS;
 	bool isControlling;
+	bool reference_flag_ = false;
+	bool reference_flag_2 = false;
 };
 #endif /* __CONTROLNODE_H */
