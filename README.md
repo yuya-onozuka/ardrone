@@ -7,6 +7,7 @@ ArUco Markerにドローンを追従させる制御。
 - OpenCVのArUco Markerライブラリを使っているため、ArUco Markerを用意。
 - [Online ArUco markers generator](https://www.google.com/search?q=aruco+create+marker&oq=aruco+create+&aqs=chrome.1.69i57j0l7.5733j0j7&sourceid=chrome&ie=UTF-8)
 - ardrone_follow_controller_param.yamlでパラメータを設定（生成したArUco Markerのサイズを指定する必要がある）。
+- ardroneのWiFiに接続。
 
 2. デモ用のlaunchファイルを起動
 - ardrone driver、キーボード操作ノード、マーカー追従制御ノードを起動
