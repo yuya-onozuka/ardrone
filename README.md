@@ -79,6 +79,9 @@ $ roslaunch ardrone_operator ardrone_follow_controller.launch
 3. ArUco Markerの原点がカメラ画像の中心にくるようにドローンの上下移動、ヨー回転を制御
 4. ArUco Markerまでの距離を一定に保つようにドローンの前後移動を制御
 
+制御コンセプト：[ar_drone.pdf](https://github.com/seniorcar-team/ardrone/blob/master/reference/ar_drone.pdf)  
+参考文献：[小型自律飛行ロボットを用いた見守りシステムの研究](https://github.com/seniorcar-team/ardrone/blob/master/reference/follow_algo.pdf)
+
 #### モーション認識
 ```
 $ roslaunch ardrone_operator receive_motion.launch
