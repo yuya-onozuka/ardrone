@@ -47,8 +47,8 @@ $ catkin_make
 ```
 * 環境設定
 ```
-echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
-echo "source /kinetic/catkin_ws/devel/setup.bash" >> ~/.bashrc
+$ echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+$ echo "source /kinetic/catkin_ws/devel/setup.bash" >> ~/.bashrc
 ```
 * ardroneパッケージ群のビルド
 マウントしたホスト側のディレクトリでgit cloneしたほうが、扱いやすい。
