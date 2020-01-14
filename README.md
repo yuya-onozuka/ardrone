@@ -64,7 +64,7 @@ $ docker commit work ros:kinetic-ardrone
 ```
 
 ### コンテナの作成、起動
-* コンテナの作成
+* コンテナの作成(GUIを使いたい場合)
 ```
 $ xhost +
 $ docker run -it --net rosnet --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" -v ~/kinetic:/kinetic --name test ros:kinetic-ardrone
