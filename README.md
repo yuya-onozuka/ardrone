@@ -63,11 +63,23 @@ $ catkin_make
 $ docker commit work ros:kinetic-ardrone
 ```
 
-### コンテナの起動
+### コンテナの作成、起動
+* コンテナの作成
+```
+$ xhost +
+$ docker run -it --net rosnet --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" -v ~/kinetic:/kinetic --name test ros:kinetic-ardrone
+```
+* コンテナの起動
 ```
 $ docker start test
 $ docker attach test
 ```
+
+### 参考
+* [ROS x Dockerのお勉強](http://robonchu.hatenablog.com/entry/2017/12/17/192649)
+* [Docker上でROSチュートリアルをやってみた](https://qiita.com/yuki-shark/items/3e54af7140b755223c3e)
+* [Ubuntu 16.04LTSにROS Kineticをインストールする](https://qiita.com/proton_lattice/items/6b26ee3a4f84776db7b7)
+
 
 ## Demo
 ### ArUco Marker follow control
